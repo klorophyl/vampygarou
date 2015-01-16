@@ -22,7 +22,7 @@ except Exception as error:
     print("Connection error: ", error)
 
 #Envoi du nom
-groupname = "" #mettez ici le nom de votre équipe
+groupname = "vampygarou" #mettez ici le nom de votre équipe
 send(sock, "NME", len(groupname), groupname)
 
 
@@ -72,7 +72,7 @@ while True:
         print("commande non attendue recue", order)
 
 #Préparez ici la déconnexion
-                
+
 #Fermeture de la socket
     sock.close()
 
