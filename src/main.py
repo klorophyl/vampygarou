@@ -1,6 +1,24 @@
 # coding: utf-8
 
+import argparse
 import socket, struct
+
+from message import vampygarou_msg
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--name",
+        help="display a message for you",
+        type=str
+    )
+    args = parser.parse_args()
+
+    print vampygarou_msg
+
+    if args.name:
+        print "\n\t\tBonjour {name}, je suis Vampygarou.\n\n".format(name=args.name.capitalize())
 
 
 def send(sock, *messages):
@@ -29,7 +47,7 @@ send(sock, "NME", len(groupname), groupname)
 
 
 #boucle principale
-while True:
+while False:
     try:
         order = sock.recv(3)
     except Exception as e:
