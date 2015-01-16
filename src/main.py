@@ -1,14 +1,16 @@
+# coding: utf-8
+
 import socket, struct
 
 
 def send(sock, *messages):
     """Send a given set of messages to the server."""
     for message in messages:
-	try:
+        try:
             data = struct.pack('=B', message) if isinstance(message, int) else message
             sock.send(data)
-	except:
-            print("Couldn't send message: ", message)
+        except:
+            print "Couldn't send message: ", message
 
 
 
@@ -18,8 +20,8 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #Connexion de la socket
 try:
     sock.connect(("127.0.0.1", 5555)) #Changez ici l'adresse ip et le port
-except Exception as error:
-    print("Connection error: ", error)
+except IOError as error:
+    print "Connection error: ", error
 
 #Envoi du nom
 groupname = "vampygarou" #mettez ici le nom de votre équipe
@@ -28,9 +30,10 @@ send(sock, "NME", len(groupname), groupname)
 
 #boucle principale
 while True:
-    order = sock.recv(3)
-    if not data:
-        print("Bizarre, c'est vide")
+    try:
+        order = sock.recv(3)
+    except Exception as e:
+        print "Error: ", e
 
     if order == "SET":
         lignes, colonnes = (struct.unpack('=B', self._s.recv(1))[0] for i in range(2))
@@ -61,15 +64,16 @@ while True:
         n = struct.unpack('=B', self._s.recv(1))[0]
         changes = []
         for i in range(n):
-            changes.append((struct.unpack('=B', self._s.recv(1))[0] for i in range(
+            changes.append((struct.unpack('=B', self._s.recv(1))[0] for i in range(5)))
         #initialisez votre carte à partir des tuples contenus dans changes
     elif order == "END":
+        pass
         #ici on met fin à la partie en cours
         #Réinitialisez votre modèle
     elif order == "BYE":
         break
     else:
-        print("commande non attendue recue", order)
+        print "Commande non attendue recue :", order
 
 #Préparez ici la déconnexion
 
