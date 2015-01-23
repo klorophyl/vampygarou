@@ -7,8 +7,6 @@ import struct
 from message import vampygarou_msg
 
 
-
-
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -49,7 +47,8 @@ class Server:
             raise Exception("Couldn't connect to server: {}".format(e))
 
     def send_team_name(self):
-        self._send_message("NME", "vampygarou")
+        name = "vampygarou"
+        self._send_message("NME", len(name), name)
 
     def get_message(self):
         try:
@@ -86,12 +85,19 @@ if __name__ == "__main__":
     server_address = args.ip or "127.0.0.1"
     server_port = args.port or 5555
 
+    print "Connecting to {}:{}...".format(server_address, server_port)
     server = Server(server_address, server_port)
+    print "Connection established"
+
+    print "Sending team name..."
     server.send_team_name()
+    print "Team name sent"
 
     # main loop
     while True:
+        print "Getting order"
         order = server.get_message()
+        print order
 
         if order == "SET":
             lignes, colonnes = (struct.unpack('=B', self._s.recv(1))[0] for i in range(2))
