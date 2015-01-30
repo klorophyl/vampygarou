@@ -4,6 +4,8 @@ import argparse
 import socket
 import struct
 
+from vampygarou import Vampygarou
+
 from message import vampygarou_msg
 
 
@@ -104,6 +106,8 @@ if __name__ == "__main__":
     print "Sending team name..."
     server.send_team_name()
     print "- Team name sent"
+
+    vampygarou = Vampygarou()
 
     # main loop
     while True:
