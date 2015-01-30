@@ -53,11 +53,11 @@ class Server:
     def get_order(self):
         return self.get_message(3)
 
-    def get_messages_int(self, message_count, size=1):
+    def get_messages_int(self, message_count):
         if message_count == 1:
-            return struct.unpack('=B', self.get_message(size))[0]
+            return struct.unpack('=B', self.get_message(1))[0]
         else:
-            return (struct.unpack('=B', self.get_message(size))[0] for _ in range(message_count))
+            return (struct.unpack('=B', self.get_message(1))[0] for _ in range(message_count))
 
     def get_message(self, size):
         try:
@@ -107,48 +107,54 @@ if __name__ == "__main__":
 
     # main loop
     while True:
-        print "Getting order"
         order = server.get_order()
-        print order
 
-        if order == "SET":
-            lignes, colonnes = server.get_messages_int(2)
-            # ici faire ce qu'il faut pour préparer votre représentation
-            # de la carte
-        elif order == "HUM":
+        if order == u"SET":
+            print "Getting map size"
+            ligns, columns = server.get_messages_int(2)
+            print "- Map size: {},{}".format(ligns, columns)
+        elif order == u"HUM":
+            print "Getting houses"
             n = server.get_messages_int(1)
-            maisons = []
+            houses = []
             for i in range(n):
-                maisons.append(server.get_messages_int(2))
-            # maisons contient la liste des coordonnées des maisons
-            # ajoutez votre code ici
-        elif order == "HME":
-            x, y = server.get_messages_int(2)
-            # ajoutez le code ici (x,y) étant les coordonnées de votre
-            # maison
+                x, y = server.get_messages_int(2)
+                houses.append([x, y])
+            print "- Houses: {}".format(houses)
+        elif order == u"HME":
+            print "Getting starting point"
+            home_x, home_y = server.get_messages_int(2)
+            print "- Home: {}".format([home_x, home_y])
         elif order == "UPD":
+            print "Entering update"
             n = server.get_messages_int(1)
             changes = []
             for i in range(n):
                 changes.append(server.get_messages_int(5))
+                print "- Changes: {}".changes[-1]
             # mettez à jour votre carte à partir des tuples contenus dans changes
             # calculez votre coup
             # préparez la trame MOV ou ATK
             # Par exemple:
             server.send_move(1, 2, 1, 1, 3)
         elif order == "MAP":
+            print "Getting map"
             n = server.get_messages_int(1)
             changes = []
             for i in range(n):
                 changes.append(server.get_messages_int(5))
             # initialisez votre carte à partir des tuples contenus dans changes
         elif order == "END":
-            pass
+            print "Entering END"
             # ici on met fin à la partie en cours
             # Réinitialisez votre modèle
         elif order == "BYE":
+            print "Entering BYE"
+            print "Bye bye!"
             break
+        elif order == "":
+            continue
         else:
-            print "Commande non attendue recue :", order
+            print "- Unknown command: `{}`".format(list(bytes(order)))
 
     server.close()
