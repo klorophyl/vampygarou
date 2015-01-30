@@ -3,5 +3,5 @@ class Vampygarou:
         self.manual = manual
         return
 
-    def update(self):
-        return
+    def get_moves(self):
+        return [[]]
