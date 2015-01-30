@@ -153,11 +153,35 @@ def end_game():
     # Réinitialisez votre modèle
 
 
+def run_game():
+    order = server.get_order()
+
+    if order == "SET":
+        get_map_size()
+    elif order == "HUM":
+        get_houses()
+    elif order == u"HME":
+        get_home()
+    elif order == "UPD":
+        update_moves()
+    elif order == "MAP":
+        update_map()
+    elif order == "END":
+        end_game()
+    elif order == "BYE":
+        print "Quitting"
+        print "Bye bye!"
+        break
+    elif order == "":
+        continue
+    else:
+        print "- Unknown command: {}".format(list(bytes(order)))
+
+
 if __name__ == "__main__":
     print vampygarou_msg
 
     args = parse_args()
-
     if args.name:
         print "\n\t\tBonjour {name}, je suis Vampygarou.\n\n".format(name=args.name.capitalize())
 
@@ -172,29 +196,7 @@ if __name__ == "__main__":
     server.send_team_name()
     print "- Team name sent"
 
-    # main loop
     while True:
-        order = server.get_order()
-
-        if order == "SET":
-            get_map_size()
-        elif order == "HUM":
-            get_houses()
-        elif order == u"HME":
-            get_home()
-        elif order == "UPD":
-            update_moves()
-        elif order == "MAP":
-            update_map()
-        elif order == "END":
-            end_game()
-        elif order == "BYE":
-            print "Quitting"
-            print "Bye bye!"
-            break
-        elif order == "":
-            continue
-        else:
-            print "- Unknown command: {}".format(list(bytes(order)))
+        run_game()
 
     server.close()
