@@ -25,6 +25,14 @@ def parse_args():
         help="the server address",
         type=str
     )
+    parser.add_argument(
+        "-manual",
+        help="player is human",
+        type=bool,
+        destination="manual",
+        action="store_true"
+    )
+    parser.set_defaults(manual=False)
 
     return parser.parse_args()
 
@@ -170,6 +178,8 @@ if __name__ == "__main__":
     args = parse_args()
     if args.name:
         print "\n\t\tBonjour {name}, je suis Vampygarou.\n\n".format(name=args.name.capitalize())
+
+    vampygarou = Vampygarou(args.manual)
 
     server_address = args.ip or "192.168.56.101"
     server_port = args.port or 5555
