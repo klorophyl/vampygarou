@@ -86,6 +86,72 @@ class Server:
                 raise Exception("Couldn't send message: {}".format(message))
 
 
+def get_map_size():
+    print "Getting map size"
+    ligns, columns = server.get_messages_int(2)
+    print "- Map size: {},{}".format(ligns, columns)
+
+
+def get_houses():
+    print "Getting houses"
+    n = server.get_messages_int(1)
+    houses = []
+    for i in range(n):
+        x, y = server.get_messages_int(2)
+        houses.append([x, y])
+    print "- Houses: {}".format(houses)
+
+
+def get_home():
+    print "Getting starting point"
+    home_x, home_y = server.get_messages_int(2)
+    print "- Home: {}".format([home_x, home_y])
+
+
+def update():
+    print "Entering update"
+    n = server.get_messages_int(1)
+    changes = []
+    for i in range(n):
+        changes.append(server.get_messages_int(5))
+        print "- Changes: {}".format(changes[-1])
+    # mettez à jour votre carte à partir des tuples contenus dans changes
+    # calculez votre coup
+    # préparez la trame MOV ou ATK
+    # Par exemple:
+    server.send_move(1, 2, 1, 1, 3)
+
+
+def update_moves():
+    print "Entering update"
+    n = server.get_messages_int(1)
+    changes = []
+    for i in range(n):
+        changes.append(server.get_messages_int(5))
+        print "- Changes: {}".format(changes[-1])
+    # mettez à jour votre carte à partir des tuples contenus dans changes
+    # calculez votre coup
+    # préparez la trame MOV ou ATK
+    # Par exemple:
+    server.send_move(1, 2, 1, 1, 3)
+
+
+def update_map():
+    print "Getting map"
+    n = server.get_messages_int(1)
+    changes = []
+    for i in range(n):
+        changes.append(server.get_messages_int(5))
+        print "- Changes: {}".format(changes[-1])
+    # initialisez votre carte à partir des tuples contenus dans changes
+
+
+def end_game():
+    print "End of game"
+    # ici on met fin à la partie en cours
+    # Réinitialisez votre modèle
+
+
 if __name__ == "__main__":
     print vampygarou_msg
 
@@ -109,46 +175,18 @@ if __name__ == "__main__":
     while True:
         order = server.get_order()
 
-        if order == u"SET":
-            print "Getting map size"
-            ligns, columns = server.get_messages_int(2)
-            print "- Map size: {},{}".format(ligns, columns)
-        elif order == u"HUM":
-            print "Getting houses"
-            n = server.get_messages_int(1)
-            houses = []
-            for i in range(n):
-                x, y = server.get_messages_int(2)
-                houses.append([x, y])
-            print "- Houses: {}".format(houses)
+        if order == "SET":
+            get_map_size()
+        elif order == "HUM":
+            get_houses()
         elif order == u"HME":
-            print "Getting starting point"
-            home_x, home_y = server.get_messages_int(2)
-            print "- Home: {}".format([home_x, home_y])
+            get_home()
         elif order == "UPD":
-            print "Entering update"
-            n = server.get_messages_int(1)
-            changes = []
-            for i in range(n):
-                changes.append(server.get_messages_int(5))
-                print "- Changes: {}".format(changes[-1])
-            # mettez à jour votre carte à partir des tuples contenus dans changes
-            # calculez votre coup
-            # préparez la trame MOV ou ATK
-            # Par exemple:
-            server.send_move(1, 2, 1, 1, 3)
+            update_moves()
         elif order == "MAP":
-            print "Getting map"
-            n = server.get_messages_int(1)
-            changes = []
-            for i in range(n):
-                changes.append(server.get_messages_int(5))
-                print "- Changes: {}".format(changes[-1])
-            # initialisez votre carte à partir des tuples contenus dans changes
+            update_map()
         elif order == "END":
-            print "End of game"
-            # ici on met fin à la partie en cours
-            # Réinitialisez votre modèle
+            end_game()
         elif order == "BYE":
             print "Quitting"
             print "Bye bye!"
