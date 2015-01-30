@@ -9,6 +9,9 @@ class Vampygarou:
     def update(self):
         return
 
+    def get_moves(self):
+        return [[]]
+
 
 class Map:
     """
