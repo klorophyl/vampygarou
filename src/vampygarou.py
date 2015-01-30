@@ -2,6 +2,10 @@
 
 
 class Vampygarou:
+    """
+    IA implementation
+    """
+
     def __init__(self, manual):
         self.manual = manual
         return
@@ -10,7 +14,15 @@ class Vampygarou:
         return
 
     def get_moves(self):
-        return [[]]
+        """
+        Function returning the next moves
+
+        params:         None
+        return:         List of moves (moves = [from_x, from_y, amount, to_x, to_y])
+        """
+        if self.manual:
+            return [[0, 0, 0, 0, 0]]
+        return [[0, 0, 0, 0, 0]]
 
 
 class Map:
