@@ -109,20 +109,6 @@ def get_home():
     print "- Home: {}".format([home_x, home_y])
 
 
-def update():
-    print "Entering update"
-    n = server.get_messages_int(1)
-    changes = []
-    for i in range(n):
-        changes.append(server.get_messages_int(5))
-        print "- Changes: {}".format(changes[-1])
-    # mettez à jour votre carte à partir des tuples contenus dans changes
-    # calculez votre coup
-    # préparez la trame MOV ou ATK
-    # Par exemple:
-    server.send_move(1, 2, 1, 1, 3)
-
-
 def update_moves():
     print "Entering update"
     n = server.get_messages_int(1)
