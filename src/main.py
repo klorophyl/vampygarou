@@ -94,7 +94,7 @@ if __name__ == "__main__":
     if args.name:
         print "\n\t\tBonjour {name}, je suis Vampygarou.\n\n".format(name=args.name.capitalize())
 
-    server_address = args.ip or "127.0.0.1"
+    server_address = args.ip or "192.168.56.101"
     server_port = args.port or 5555
 
     print "Connecting to {}:{}...".format(server_address, server_port)
