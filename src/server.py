@@ -26,7 +26,7 @@ class Server:
             raise Exception("Couldn't connect to server: {}".format(e))
 
     def send_team_name(self):
-        name = "vampygarou"
+        name = "Vampygarou"
         print "Sending team name..."
         self._send_message("NME", len(name), name)
         print "- Team name sent"

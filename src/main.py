@@ -2,7 +2,8 @@
 import argparse
 
 from server import Server
-from vampygarou import Vampygarou, Map
+from vampygarou import Vampygarou
+from mapping import Map
 from message import vampygarou_msg
 
 
