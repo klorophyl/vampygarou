@@ -174,9 +174,7 @@ def run_game():
         print "Quitting"
         print "Bye bye!"
         return False
-    elif order == "":
-        pass
-    else:
+    elif len(order) > 0:
         print "- Unknown command: {}".format(list(bytes(order)))
 
     return True
@@ -197,7 +195,8 @@ if __name__ == "__main__":
     server = Server(server_address, server_port)
     server.send_team_name()
 
-    while True:
-        run_game()
+    running = True
+    while running:
+        running = run_game()
 
     server.close()
