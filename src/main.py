@@ -28,8 +28,7 @@ def parse_args():
     parser.add_argument(
         "-manual",
         help="player is human",
-        type=bool,
-        destination="manual",
+        dest="manual",
         action="store_true"
     )
     parser.set_defaults(manual=False)
