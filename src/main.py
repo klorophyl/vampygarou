@@ -131,7 +131,7 @@ if __name__ == "__main__":
             changes = []
             for i in range(n):
                 changes.append(server.get_messages_int(5))
-                print "- Changes: {}".changes[-1]
+                print "- Changes: {}".format(changes[-1])
             # mettez à jour votre carte à partir des tuples contenus dans changes
             # calculez votre coup
             # préparez la trame MOV ou ATK
@@ -145,16 +145,16 @@ if __name__ == "__main__":
                 changes.append(server.get_messages_int(5))
             # initialisez votre carte à partir des tuples contenus dans changes
         elif order == "END":
-            print "Entering END"
+            print "End of game"
             # ici on met fin à la partie en cours
             # Réinitialisez votre modèle
         elif order == "BYE":
-            print "Entering BYE"
+            print "Quitting"
             print "Bye bye!"
             break
         elif order == "":
             continue
         else:
-            print "- Unknown command: `{}`".format(list(bytes(order)))
+            print "- Unknown command: {}".format(list(bytes(order)))
 
     server.close()
