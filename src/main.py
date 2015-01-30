@@ -4,6 +4,7 @@ import argparse
 import socket
 import struct
 
+from vampygarou import Vampygarou
 from message import vampygarou_msg
 
 
