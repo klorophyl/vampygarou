@@ -14,6 +14,12 @@ class Vampygarou:
     def update(self):
         return
 
+    def get_legal_moves_for(self):
+        """
+        Returns a list of possible moves
+        """
+        return
+
     def get_moves(self):
         """
         Function returning the next moves
