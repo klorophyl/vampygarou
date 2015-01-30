@@ -1,6 +1,7 @@
 # coding: utf-8
 import socket
 import struct
+import itertools
 
 
 class Server:
@@ -48,8 +49,13 @@ class Server:
 
         return None
 
-    def send_move(self, *args):
-        self._send_message("MOV", *args)
+    def send_moves(self, *moves):
+        """
+        Send moves to server
+
+        param:  moves ([[x, x, x, x, x], [y, y, y, y, y], [z, z, z, z] ...])
+        """
+        self._send_message("MOV", len(moves), *itertools.chain(*moves))
 
     def close(self):
         self._sock.close()
