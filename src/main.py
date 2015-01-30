@@ -52,8 +52,9 @@ def get_houses(vampygarou):
 
 def get_home(vampygarou):
     print "Getting starting point"
-    home_x, home_y = server.get_messages_int(2)
-    print "- Home: {}".format([home_x, home_y])
+    x, y = server.get_messages_int(2)
+    vampygarou.map.set_home(x, y)
+    print "- Home: {}".format([x, y])
 
 
 def update_moves(vampygarou):

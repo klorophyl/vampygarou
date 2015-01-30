@@ -36,21 +36,30 @@ class Map:
     def __init__(self, size_x, size_y):
         self.size_x = size_x
         self.size_y = size_y
-        self.grid = [[Map.EMPTY for _ in range(size_x)] for _ in range(size_y)]
+        self.grid = [[Map.EMPTY for x in range(size_x)] for y in range(size_y)]
 
-    def set_home(self, home_x, home_y):
-        self.grid[home_x][home_y] = Map.HOME
+    def set_home(self, x, y):
+        if not 0 < x < self.size_x:
+            raise ValueError("Home x outside bounds")
+        if not 0 < y < self.size_y:
+            raise ValueError("Home y outside bounds")
 
-    def add_house(self, house_x, house_y):
-        self.grid[house_x][house_y] = Map.HOUSE
+        self.set_cell(x, y, Map.HOME)
+
+    def add_house(self, x, y):
+        self.set_cell(x, y, Map.HOUSE)
+
+    def set_cell(self, x, y, cell_type):
+        self.grid[y][x] = cell_type
 
     def __repr__(self):
         """
         Representation of the map
         """
-        s = "  "
+        s = "  -" + "---" * self.size_x + "\n  "
         for x in range(self.size_y):
             for y in range(self.size_x):
                 s += "|{} ".format(self.grid[x][y])
-            s += "\n  "
+            s += "|\n  "
+        s += "-" + "---" * self.size_x
         return s
