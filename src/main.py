@@ -1,9 +1,7 @@
 # coding: utf-8
-
 import argparse
-import socket
-import struct
 
+from server import Server
 from vampygarou import Vampygarou, Map
 from message import vampygarou_msg
 
@@ -36,94 +34,29 @@ def parse_args():
     return parser.parse_args()
 
 
-class Server:
-    """
-    Main game server
-    """
-
-    def __init__(self, address, port):
-        """
-        Create a connection to the server
-        """
-        self.address = address
-        self.port = port
-
-        print "Connecting to {}:{}...".format(self.address, self.port)
-
-        self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            self._sock.connect((server_address, server_port))
-            print "- Connection established"
-        except Exception as e:
-            raise Exception("Couldn't connect to server: {}".format(e))
-
-    def send_team_name(self):
-        name = "vampygarou"
-        print "Sending team name..."
-        self._send_message("NME", len(name), name)
-        print "- Team name sent"
-
-    def get_order(self):
-        return self.get_message(3)
-
-    def get_messages_int(self, message_count):
-        if message_count == 1:
-            return struct.unpack('=B', self.get_message(1))[0]
-        else:
-            return [struct.unpack('=B', self.get_message(1))[0] for _ in range(message_count)]
-
-    def get_message(self, size):
-        try:
-            message = self._sock.recv(size)
-            return message
-        except Exception as e:
-            raise Exception("Couldn't receive message: {}".format(e))
-
-        return None
-
-    def send_move(self, *args):
-        self._send_message("MOV", *args)
-
-    def close(self):
-        self._sock.close()
-
-    def _send_message(self, *messages):
-        """
-        Send a given set of messages to the server
-        """
-        for message in messages:
-            try:
-                data = struct.pack('=B', message) if isinstance(message, int) else message
-                self._sock.send(data)
-            except:
-                raise Exception("Couldn't send message: {}".format(message))
-
-
-def get_map_size():
+def get_map_size(vampygarou):
     print "Getting map size"
     ligns, columns = server.get_messages_int(2)
-    print "- Map size: {},{}".format(ligns, columns)
-    game_map = Map(ligns, columns)
-    print game_map
+    print "- Map size: {},{}".format(columns, ligns)
+    vampygarou.map = Map(columns, ligns)
 
 
-def get_houses():
+def get_houses(vampygarou):
     print "Getting houses"
     n = server.get_messages_int(1)
-    houses = []
     for i in range(n):
         x, y = server.get_messages_int(2)
-        houses.append([x, y])
-    print "- Houses: {}".format(houses)
+        vampygarou.map.add_house(x, y)
+    print "- Got {} houses".format(n)
 
 
-def get_home():
+def get_home(vampygarou):
     print "Getting starting point"
     home_x, home_y = server.get_messages_int(2)
     print "- Home: {}".format([home_x, home_y])
 
 
-def update_moves():
+def update_moves(vampygarou):
     print "Entering update"
     n = server.get_messages_int(1)
     changes = []
@@ -138,7 +71,7 @@ def update_moves():
         server.send_move(*moves)
 
 
-def update_map():
+def update_map(vampygarou):
     print "Getting map"
     n = server.get_messages_int(1)
     changes = []
@@ -148,33 +81,35 @@ def update_map():
     # initialisez votre carte à partir des tuples contenus dans changes
 
 
-def end_game():
+def end_game(vampygarou):
     print "End of game"
     # ici on met fin à la partie en cours
     # Réinitialisez votre modèle
 
 
-def run_game():
+def run_game(vampygarou):
     order = server.get_order()
 
     if order == "SET":
-        get_map_size()
+        get_map_size(vampygarou)
     elif order == "HUM":
-        get_houses()
+        get_houses(vampygarou)
     elif order == u"HME":
-        get_home()
+        get_home(vampygarou)
     elif order == "UPD":
-        update_moves()
+        update_moves(vampygarou)
     elif order == "MAP":
-        update_map()
+        update_map(vampygarou)
     elif order == "END":
-        end_game()
+        end_game(vampygarou)
     elif order == "BYE":
         print "Quitting"
         print "Bye bye!"
         return False
     elif len(order) > 0:
         print "- Unknown command: {}".format(list(bytes(order)))
+
+    print vampygarou.map
 
     return True
 
@@ -196,6 +131,6 @@ if __name__ == "__main__":
 
     running = True
     while running:
-        running = run_game()
+        running = run_game(vampygarou)
 
     server.close()
