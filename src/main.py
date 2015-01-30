@@ -68,8 +68,7 @@ def update_moves(vampygarou):
     # calculez votre coup
     # préparez la trame MOV ou ATK
     # Par exemple:
-    for moves in vampygarou.get_moves():
-        server.send_move(*moves)
+    server.send_moves(*vampygarou.get_moves())
 
 
 def update_map(vampygarou):
