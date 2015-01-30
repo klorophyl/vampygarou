@@ -57,7 +57,7 @@ class Server:
         if message_count == 1:
             return struct.unpack('=B', self.get_message(1))[0]
         else:
-            return (struct.unpack('=B', self.get_message(1))[0] for _ in range(message_count))
+            return [struct.unpack('=B', self.get_message(1))[0] for _ in range(message_count)]
 
     def get_message(self, size):
         try:
@@ -99,11 +99,11 @@ if __name__ == "__main__":
 
     print "Connecting to {}:{}...".format(server_address, server_port)
     server = Server(server_address, server_port)
-    print "Connection established"
+    print "- Connection established"
 
     print "Sending team name..."
     server.send_team_name()
-    print "Team name sent"
+    print "- Team name sent"
 
     # main loop
     while True:
@@ -143,6 +143,7 @@ if __name__ == "__main__":
             changes = []
             for i in range(n):
                 changes.append(server.get_messages_int(5))
+                print "- Changes: {}".format(changes[-1])
             # initialisez votre carte à partir des tuples contenus dans changes
         elif order == "END":
             print "End of game"
