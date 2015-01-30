@@ -41,15 +41,20 @@ class Server:
         self.address = address
         self.port = port
 
+        print "Connecting to {}:{}...".format(self.address, self.port)
+
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self._sock.connect((server_address, server_port))
+            print "- Connection established"
         except Exception as e:
             raise Exception("Couldn't connect to server: {}".format(e))
 
     def send_team_name(self):
         name = "vampygarou"
+        print "Sending team name..."
         self._send_message("NME", len(name), name)
+        print "- Team name sent"
 
     def get_order(self):
         return self.get_message(3)
@@ -174,13 +179,8 @@ if __name__ == "__main__":
     server_address = args.ip or "192.168.56.101"
     server_port = args.port or 5555
 
-    print "Connecting to {}:{}...".format(server_address, server_port)
     server = Server(server_address, server_port)
-    print "- Connection established"
-
-    print "Sending team name..."
     server.send_team_name()
-    print "- Team name sent"
 
     while True:
         run_game()
