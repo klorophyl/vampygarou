@@ -4,7 +4,7 @@ import argparse
 import socket
 import struct
 
-from vampygarou import Vampygarou
+from vampygarou import Vampygarou, Map
 from message import vampygarou_msg
 
 
@@ -104,6 +104,8 @@ def get_map_size():
     print "Getting map size"
     ligns, columns = server.get_messages_int(2)
     print "- Map size: {},{}".format(ligns, columns)
+    game_map = Map(ligns, columns)
+    print game_map
 
 
 def get_houses():
@@ -170,11 +172,13 @@ def run_game():
     elif order == "BYE":
         print "Quitting"
         print "Bye bye!"
-        break
+        return False
     elif order == "":
-        continue
+        pass
     else:
         print "- Unknown command: {}".format(list(bytes(order)))
+
+    return True
 
 
 if __name__ == "__main__":
