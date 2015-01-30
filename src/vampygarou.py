@@ -84,8 +84,8 @@ class Map:
         self.size_y = size_y
         self.home = []
         self.houses = []
-        self.vampires = [Vampires(2, 3)]
-        self.werewolves = [Werewolves(3, 4)]
+        self.vampires = []
+        self.werewolves = []
 
     def set_home(self, x, y):
         self._check_bounds(x, y, "Home")
@@ -108,9 +108,9 @@ class Map:
         """
         Representation of the map
         """
-        grid = [[" " for x in range(self.size_x)] for y in range(self.size_y)]
+        grid = [["  " for x in range(self.size_x)] for y in range(self.size_y)]
         for house in self.houses:
-            grid[house.y][house.x] = "H"
+            grid[house.y][house.x] = "H "
         for vampire in self.vampires:
             grid[vampire.y][vampire.x] = str(vampire)
         for werewolve in self.werewolves:
@@ -119,7 +119,7 @@ class Map:
         s = "  -" + "---" * self.size_x + "\n  "
         for x in range(self.size_y):
             for y in range(self.size_x):
-                s += "|{} ".format(grid[x][y])
+                s += "|{}".format(grid[x][y])
             s += "|\n  "
         s += "-" + "---" * self.size_x
         return s
