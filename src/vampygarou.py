@@ -1,13 +1,13 @@
 # coding: utf-8
 
-import pdb
 
 class Vampygarou:
     """
     IA implementation
     """
 
-    def __init__(self, manual):
+    def __init__(self, name, manual):
+        self.name = name
         self.manual = manual
         self.map = None
         self.race = None

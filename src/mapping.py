@@ -76,9 +76,9 @@ class Map:
             if humans > 0:
                 self.houses.append(House(x, y, humans))
             if vampires > 0:
-                self.houses.append(Vampires(x, y, vampires))
+                self.vampires.append(Vampires(x, y, vampires))
             if werewolves > 0:
-                self.houses.append(Werewolves(x, y, werewolves))
+                self.werewolves.append(Werewolves(x, y, werewolves))
 
     def _check_bounds(self, x, y, cell_type):
         if not 0 < x < self.size_x:

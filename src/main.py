@@ -12,7 +12,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-name",
-        help="display a message for you",
+        help="the team name",
         type=str
     )
     parser.add_argument(
@@ -83,8 +83,6 @@ def update_map(vampygarou):
 
 def end_game(vampygarou):
     print "End of game"
-    # ici on met fin à la partie en cours
-    # Réinitialisez votre modèle
 
 
 def run_game(vampygarou):
@@ -121,16 +119,17 @@ if __name__ == "__main__":
         Colors.disable()
 
     args = parse_args()
-    if args.name:
-        print "\n\t\tBonjour {name}, je suis Vampygarou.\n\n".format(name=args.name.capitalize())
 
-    vampygarou = Vampygarou(args.manual)
+    name = args.name or "Vampygarou"
+    print "\n\t\tBonjour {}, je suis Vampygarou.\n\n".format(name)
+
+    vampygarou = Vampygarou(name, args.manual)
 
     server_address = args.ip or "127.0.0.1"
     server_port = args.port or 5555
 
     server = Server(server_address, server_port)
-    server.send_team_name()
+    server.send_team_name(vampygarou.name)
 
     running = True
     while running:
