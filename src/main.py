@@ -65,10 +65,7 @@ def update_moves(vampygarou):
     for i in range(n):
         changes.append(server.get_messages_int(5))
         print "- Changes: {}".format(changes[-1])
-    # mettez à jour votre carte à partir des tuples contenus dans changes
-    # calculez votre coup
-    # préparez la trame MOV ou ATK
-    # Par exemple:
+
     server.send_moves(*vampygarou.get_moves())
 
 
@@ -79,7 +76,8 @@ def update_map(vampygarou):
     for i in range(n):
         changes.append(server.get_messages_int(5))
         print "- Changes: {}".format(changes[-1])
-    # initialisez votre carte à partir des tuples contenus dans changes
+
+    vampygarou.map.init_counts(changes)
 
 
 def end_game(vampygarou):
