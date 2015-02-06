@@ -83,9 +83,9 @@ class Map:
                 self.werewolves.append(Werewolves(x, y, werewolves))
 
     def _check_bounds(self, x, y, cell_type):
-        if not 0 < x < self.size_x:
+        if not 0 <= x < self.size_x:
             raise ValueError(cell_type + " x outside bounds")
-        if not 0 < y < self.size_y:
+        if not 0 <= y < self.size_y:
             raise ValueError(cell_type + " y outside bounds")
 
     def __repr__(self):
