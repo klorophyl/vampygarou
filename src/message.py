@@ -7,6 +7,16 @@ class Colors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+    @classmethod
+    def disable(cls):
+        cls.HEADER = ""
+        cls.BLUE = ""
+        cls.GREEN = ""
+        cls.RED = ""
+        cls.END = ""
+        cls.BOLD = ""
+        cls.UNDERLINE = ""
+
 vampygarou_msg = r"""
                              *    (       )               (       )
              (     (  `   )\ ) ( /( (       (     )\ ) ( /(

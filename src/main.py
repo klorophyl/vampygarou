@@ -1,10 +1,11 @@
 # coding: utf-8
 import argparse
+import os
 
 from server import Server
 from vampygarou import Vampygarou
 from mapping import Map
-from message import vampygarou_msg
+from message import vampygarou_msg, Colors
 
 
 def parse_args():
@@ -115,6 +116,9 @@ def run_game(vampygarou):
 
 if __name__ == "__main__":
     print vampygarou_msg
+
+    if os.name == "nt":
+        Colors.disable()
 
     args = parse_args()
     if args.name:
