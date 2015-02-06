@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import pdb
 
 class Vampygarou:
     """
@@ -8,16 +9,18 @@ class Vampygarou:
 
     def __init__(self, manual):
         self.manual = manual
+        self.map = None
+        self.race = None
         return
 
     def update(self):
         return
 
-    def get_legal_moves_for(self):
+    def get_legal_moves_for(self, cell):
         """
         Returns a list of possible moves
         """
-        return
+        return []
 
     def get_moves(self):
         """
@@ -27,18 +30,31 @@ class Vampygarou:
         return:         List of moves (moves = [from_x, from_y, amount, to_x, to_y])
         """
         if self.manual:
-            moves_raw = raw_input(
-                "\nEnter list of moves \"from_x, from_y, amount, to_x, to_y;"
-                "from_x,from_y,amount,to_x,to_y\" : \n"
-            ).strip().split(";")
+            return self.get_manual_moves()
 
-            moves = [map(int, move.split(",")) for move in moves_raw]
+        return self.get_random_moves()
 
-            for move in moves:
-                if len(move) != 5:
-                    print "One of your move is illegal, please respect the syntax"
-                    return self.get_moves()
+    def get_manual_moves(self):
+        """
+        Ask for move to manual player
+        """
+        moves_raw = raw_input(
+            "\nEnter list of moves \"from_x, from_y, amount, to_x, to_y;"
+            "from_x,from_y,amount,to_x,to_y\" : \n"
+        ).strip().split(";")
 
-            return moves
+        moves = [map(int, move.split(",")) for move in moves_raw]
 
+        for move in moves:
+            if len(move) != 5:
+                print "One of your move is illegal, please respect the syntax"
+                return self.get_moves()
+
+        return moves
+
+    def get_random_moves(self):
+        cells = self.map.vampires if self.race == 'vampire' else self.map.werewolves
+        legal_moves = []
+        for cell in cells:
+            legal_moves += self.get_legal_moves_for(cell)
         return [[0, 0, 0, 0, 0]]
