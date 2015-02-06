@@ -80,6 +80,8 @@ def update_map(vampygarou):
 
     vampygarou.map.init_counts(changes)
 
+    if not vampygarou.race:
+        vampygarou.retrieve_race()
 
 def end_game(vampygarou):
     print "End of game"

@@ -1,4 +1,5 @@
 # coding: utf-8
+from mapping import Cell
 
 
 class Vampygarou:
@@ -13,14 +14,44 @@ class Vampygarou:
         self.race = None
         return
 
+    def retrieve_race(self):
+        if self.map.home.get_pos() == self.map.vampires[0].get_pos():
+            self.race = "vampire"
+        else:
+            self.race = "werewolve"
+
+    def get_cells(self):
+        return self.map.vampires if self.race == 'vampire' else self.map.werewolves
+
     def update(self):
         return
+
+    def get_legal_cells_for(self, cell):
+        """
+        Returns a list of possible cells
+        """
+        legal_cells = []
+        if cell.x > 0:
+            legal_cells.append(Cell(cell.x - 1, cell.y))
+        if cell.y > 0:
+            legal_cells.append(Cell(cell.x, cell.y - 1))
+        if cell.x < self.map.size_x - 1:
+            legal_cells.append(Cell(cell.x + 1, cell.y))
+        if cell.y < self.map.size_y - 1:
+            legal_cells.append(Cell(cell.x, cell.y + 1))
+
+        return legal_cells
+
 
     def get_legal_moves_for(self, cell):
         """
         Returns a list of possible moves
         """
-        return []
+        legal_moves = []
+        for legal_cell in self.get_legal_cells_for(cell):
+            for count in xrange(1, cell.population):
+                legal_moves.append([cell.x, cell.y, count, legal_cell.x, legal_cell.y])
+        return legal_moves
 
     def get_moves(self):
         """
@@ -53,8 +84,9 @@ class Vampygarou:
         return moves
 
     def get_random_moves(self):
-        cells = self.map.vampires if self.race == 'vampire' else self.map.werewolves
+        cells = self.get_cells()
         legal_moves = []
         for cell in cells:
             legal_moves += self.get_legal_moves_for(cell)
-        return [[0, 0, 0, 0, 0]]
+        # import pdb; pdb.set_trace()
+        return [legal_moves[0]]

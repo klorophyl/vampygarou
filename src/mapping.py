@@ -14,6 +14,8 @@ class Cell(object):
         self.x = x
         self.y = y
 
+    def get_pos(self):
+        return (self.x, self.y)
 
 class PopulatedCell(Cell):
     def __init__(self, x, y, population=0):
