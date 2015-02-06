@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
     vampygarou = Vampygarou(args.manual)
 
-    server_address = args.ip or "192.168.56.101"
+    server_address = args.ip or "127.0.0.1"
     server_port = args.port or 5555
 
     server = Server(server_address, server_port)
