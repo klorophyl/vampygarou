@@ -76,7 +76,7 @@ def update_map(vampygarou):
     changes = []
     for i in range(n):
         changes.append(server.get_messages_int(5))
-        print "- Changes: {}".format(changes[-1])
+        # print "- Changes: {}".format(changes[-1])
 
     vampygarou.map.init_counts(changes)
 
@@ -98,6 +98,7 @@ def run_game(vampygarou):
         update_moves(vampygarou)
     elif order == "MAP":
         update_map(vampygarou)
+        print vampygarou.map
     elif order == "END":
         end_game(vampygarou)
     elif order == "BYE":
@@ -106,8 +107,6 @@ def run_game(vampygarou):
         return False
     elif len(order) > 0:
         print "- Unknown command: {}".format(list(bytes(order)))
-
-    print vampygarou.map
 
     return True
 
