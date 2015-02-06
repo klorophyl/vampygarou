@@ -1,16 +1,18 @@
 # coding: utf-8
 import argparse
+import os
 
 from server import Server
-from vampygarou import Vampygarou, Map
-from message import vampygarou_msg
+from vampygarou import Vampygarou
+from mapping import Map
+from message import vampygarou_msg, Colors
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-name",
-        help="display a message for you",
+        help="the team name",
         type=str
     )
     parser.add_argument(
@@ -64,10 +66,7 @@ def update_moves(vampygarou):
     for i in range(n):
         changes.append(server.get_messages_int(5))
         print "- Changes: {}".format(changes[-1])
-    # mettez à jour votre carte à partir des tuples contenus dans changes
-    # calculez votre coup
-    # préparez la trame MOV ou ATK
-    # Par exemple:
+
     server.send_moves(*vampygarou.get_moves())
 
 
@@ -77,14 +76,13 @@ def update_map(vampygarou):
     changes = []
     for i in range(n):
         changes.append(server.get_messages_int(5))
-        print "- Changes: {}".format(changes[-1])
-    # initialisez votre carte à partir des tuples contenus dans changes
+        # print "- Changes: {}".format(changes[-1])
+
+    vampygarou.map.init_counts(changes)
 
 
 def end_game(vampygarou):
     print "End of game"
-    # ici on met fin à la partie en cours
-    # Réinitialisez votre modèle
 
 
 def run_game(vampygarou):
@@ -100,6 +98,7 @@ def run_game(vampygarou):
         update_moves(vampygarou)
     elif order == "MAP":
         update_map(vampygarou)
+        print vampygarou.map
     elif order == "END":
         end_game(vampygarou)
     elif order == "BYE":
@@ -109,25 +108,27 @@ def run_game(vampygarou):
     elif len(order) > 0:
         print "- Unknown command: {}".format(list(bytes(order)))
 
-    print vampygarou.map
-
     return True
 
 
 if __name__ == "__main__":
     print vampygarou_msg
 
+    if os.name == "nt":
+        Colors.disable()
+
     args = parse_args()
-    if args.name:
-        print "\n\t\tBonjour {name}, je suis Vampygarou.\n\n".format(name=args.name.capitalize())
 
-    vampygarou = Vampygarou(args.manual)
+    name = args.name or "Vampygarou"
+    print "\n\t\tBonjour {}, je suis Vampygarou.\n\n".format(name)
 
-    server_address = args.ip or "192.168.56.101"
+    vampygarou = Vampygarou(name, args.manual)
+
+    server_address = args.ip or "127.0.0.1"
     server_port = args.port or 5555
 
     server = Server(server_address, server_port)
-    server.send_team_name()
+    server.send_team_name(vampygarou.name)
 
     running = True
     while running:
