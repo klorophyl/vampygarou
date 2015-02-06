@@ -16,13 +16,14 @@ class Cell(object):
 
 
 class PopulatedCell(Cell):
-    def __init__(self, x, y):
+    def __init__(self, x, y, population=0):
         super(PopulatedCell, self).__init__(x, y)
-        self.population = 0
+        self.population = population
 
 
 class House(PopulatedCell):
-    pass
+    def __str__(self):
+        return "H" + str(self.population)
 
 
 class Home(Cell):
@@ -62,6 +63,23 @@ class Map:
     def set_cell(self, x, y, cell_type):
         self.grid[y][x] = cell_type
 
+    def update_counts(self, cells_info):
+        """
+        Update the number of humans, vampires, and werewolves on the map.
+        """
+        self.vampires = []
+        self.werewolves = []
+        self.houses = []
+
+        for cell in cells_info:
+            x, y, humans, vampires, werewolves = cell
+            if humans > 0:
+                self.houses.append(House(x, y, humans))
+            if vampires > 0:
+                self.houses.append(Vampires(x, y, vampires))
+            if werewolves > 0:
+                self.houses.append(Werewolves(x, y, werewolves))
+
     def _check_bounds(self, x, y, cell_type):
         if not 0 < x < self.size_x:
             raise ValueError(cell_type + " x outside bounds")
@@ -74,7 +92,7 @@ class Map:
         """
         grid = [["  " for x in range(self.size_x)] for y in range(self.size_y)]
         for house in self.houses:
-            grid[house.y][house.x] = "H "
+            grid[house.y][house.x] = str(house)
         for vampire in self.vampires:
             grid[vampire.y][vampire.x] = str(vampire)
         for werewolve in self.werewolves:
