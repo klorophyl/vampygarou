@@ -63,7 +63,7 @@ class Map:
     def set_cell(self, x, y, cell_type):
         self.grid[y][x] = cell_type
 
-    def update_counts(self, cells_info):
+    def init_counts(self, cells_info):
         """
         Update the number of humans, vampires, and werewolves on the map.
         """

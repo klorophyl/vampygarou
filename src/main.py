@@ -77,7 +77,7 @@ def update_map(vampygarou):
         changes.append(server.get_messages_int(5))
         print "- Changes: {}".format(changes[-1])
 
-    vampygarou.map.update_counts(changes)
+    vampygarou.map.init_counts(changes)
 
 
 def end_game(vampygarou):
