@@ -69,11 +69,11 @@ def update_moves(vampygarou):
         changes.append(server.get_messages_int(5))
         print "- Changes: {}".format(changes[-1])
 
-    vampygarou.map.update_with_changes(changes)
 
     ###################################### TO BE REMOVED ####################################
-    time.sleep(1)
     try:
+        vampygarou.map.update_with_changes(changes)
+        time.sleep(0.5)
         server.send_moves(*vampygarou.get_moves())
     except Exception as exc:
         print "Exception in user code:"
@@ -82,6 +82,7 @@ def update_moves(vampygarou):
         print '-'*60
         import pdb; pdb.set_trace()
     #########################################################################################
+    # vampygarou.map.update_with_changes(changes)
     # server.send_moves(*vampygarou.get_moves())
 
 

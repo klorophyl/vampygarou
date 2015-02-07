@@ -95,9 +95,10 @@ class Map:
                 (self.houses, House) if change[2] else
                 (self.vampires, Vampires) if change[3] else
                 (self.werewolves, Werewolves) if change[4] else
-                []
+                (None, None)
             )
-            to_change.append(cell_type(change[0], change[1], amount))
+            if to_change is not None:
+                to_change.append(cell_type(change[0], change[1], amount))
 
     def _check_bounds(self, x, y, cell_type):
         if not 0 <= x < self.size_x:

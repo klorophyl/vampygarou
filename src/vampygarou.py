@@ -1,4 +1,5 @@
 # coding: utf-8
+import random
 from mapping import Cell
 
 
@@ -31,6 +32,8 @@ class Vampygarou:
         Returns a list of possible cells
         """
         legal_cells = []
+
+        # straight directions
         if cell.x > 0:
             legal_cells.append(Cell(cell.x - 1, cell.y))
         if cell.y > 0:
@@ -40,8 +43,17 @@ class Vampygarou:
         if cell.y < self.map.size_y - 1:
             legal_cells.append(Cell(cell.x, cell.y + 1))
 
-        return legal_cells
+        # diagonal directions
+        if cell.x > 0 and cell.y > 0:
+            legal_cells.append(Cell(cell.x - 1, cell.y - 1))
+        if cell.x < self.map.size_x - 1 and cell.y > 0:
+            legal_cells.append(Cell(cell.x + 1, cell.y - 1))
+        if cell.x > 0 and cell.y < self.map.size_y - 1:
+            legal_cells.append(Cell(cell.x - 1, cell.y + 1))
+        if cell.x < self.map.size_x - 1 and cell.y < self.map.size_y - 1:
+            legal_cells.append(Cell(cell.x + 1, cell.y + 1))
 
+        return legal_cells
 
     def get_legal_moves_for(self, cell):
         """
@@ -49,7 +61,7 @@ class Vampygarou:
         """
         legal_moves = []
         for legal_cell in self.get_legal_cells_for(cell):
-            for count in xrange(1, cell.population):
+            for count in range(1, cell.population + 1):
                 legal_moves.append([cell.x, cell.y, count, legal_cell.x, legal_cell.y])
         return legal_moves
 
@@ -88,5 +100,4 @@ class Vampygarou:
         legal_moves = []
         for cell in cells:
             legal_moves += self.get_legal_moves_for(cell)
-        move = [legal_moves[0]]
-        return move
+        return [random.choice(legal_moves)]
