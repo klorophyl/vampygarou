@@ -67,7 +67,7 @@ class Map:
 
     def init_counts(self, cells_info):
         """
-        Update the number of humans, vampires, and werewolves on the map.
+        Init the number of humans, vampires, and werewolves on the map.
         """
         self.vampires = []
         self.werewolves = []
@@ -83,6 +83,9 @@ class Map:
                 self.werewolves.append(Werewolves(x, y, werewolves))
 
     def update_with_changes(self, changes):
+        """
+        Update the number of humans, vampires, and werewolves on the map from changes sent by server.
+        """
         for change in changes:
             # clean previous list from change
             self.houses = [cell for cell in self.houses if cell.get_pos() != (change[0], change[1])]
