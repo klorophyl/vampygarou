@@ -82,6 +82,23 @@ class Map:
             if werewolves > 0:
                 self.werewolves.append(Werewolves(x, y, werewolves))
 
+    def update_with_changes(self, changes):
+        for change in changes:
+            # clean previous list from change
+            self.houses = [cell for cell in self.houses if cell.get_pos() != (change[0], change[1])]
+            self.vampires = [cell for cell in self.vampires if cell.get_pos() != (change[0], change[1])]
+            self.werewolves = [cell for cell in self.werewolves if cell.get_pos() != (change[0], change[1])]
+
+            # apply change
+            amount = change[2] or change[3] or change[4]
+            to_change, cell_type = (
+                (self.houses, House) if change[2] else
+                (self.vampires, Vampires) if change[3] else
+                (self.werewolves, Werewolves) if change[4] else
+                []
+            )
+            to_change.append(cell_type(change[0], change[1], amount))
+
     def _check_bounds(self, x, y, cell_type):
         if not 0 <= x < self.size_x:
             raise ValueError(cell_type + " x outside bounds")

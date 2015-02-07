@@ -88,5 +88,5 @@ class Vampygarou:
         legal_moves = []
         for cell in cells:
             legal_moves += self.get_legal_moves_for(cell)
-        # import pdb; pdb.set_trace()
-        return [legal_moves[0]]
+        move = [legal_moves[0]]
+        return move

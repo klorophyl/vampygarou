@@ -1,6 +1,8 @@
 # coding: utf-8
 import argparse
 import os
+import time
+import sys, traceback
 
 from server import Server
 from vampygarou import Vampygarou
@@ -67,7 +69,20 @@ def update_moves(vampygarou):
         changes.append(server.get_messages_int(5))
         print "- Changes: {}".format(changes[-1])
 
-    server.send_moves(*vampygarou.get_moves())
+    vampygarou.map.update_with_changes(changes)
+
+    ###################################### TO BE REMOVED ####################################
+    time.sleep(1)
+    try:
+        server.send_moves(*vampygarou.get_moves())
+    except Exception as exc:
+        print "Exception in user code:"
+        print '-'*60
+        traceback.print_exc(file=sys.stdout)
+        print '-'*60
+        import pdb; pdb.set_trace()
+    #########################################################################################
+    # server.send_moves(*vampygarou.get_moves())
 
 
 def update_map(vampygarou):
