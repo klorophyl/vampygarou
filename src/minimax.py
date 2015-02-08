@@ -37,7 +37,7 @@ def max_value(state):
         return heuristique(state)
     else:
         h = 0
-        for action in Actions
+        for action in Actions:
             if heuristique(state.act(action)) > h:
                 h = heuristique(state.act(action))
                 action_to_play = action

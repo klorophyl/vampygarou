@@ -1,5 +1,6 @@
 # coding: utf-8
-import random, itertools
+import random
+import itertools
 
 from mapping import Cell
 

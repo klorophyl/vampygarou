@@ -2,7 +2,9 @@
 import argparse
 import os
 import time
-import sys, traceback
+import sys
+import traceback
+import pdb
 
 from server import Server
 from vampygarou import Vampygarou
@@ -69,8 +71,7 @@ def update_moves(vampygarou):
         changes.append(server.get_messages_int(5))
         print "- Changes: {}".format(changes[-1])
 
-
-    ###################################### TO BE REMOVED ####################################
+    # ##################################### TO BE REMOVED ####################################
     try:
         vampygarou.map.update_with_changes(changes)
         time.sleep(0.5)
@@ -80,8 +81,8 @@ def update_moves(vampygarou):
         print '-'*60
         traceback.print_exc(file=sys.stdout)
         print '-'*60
-        import pdb; pdb.set_trace()
-    #########################################################################################
+        pdb.set_trace()
+    # ########################################################################################
     # vampygarou.map.update_with_changes(changes)
     # server.send_moves(*vampygarou.get_moves())
 
@@ -98,6 +99,7 @@ def update_map(vampygarou):
 
     if not vampygarou.race:
         vampygarou.retrieve_race()
+
 
 def end_game(vampygarou):
     print "End of game"

@@ -17,6 +17,7 @@ class Cell(object):
     def get_pos(self):
         return (self.x, self.y)
 
+
 class PopulatedCell(Cell):
     def __init__(self, x, y, population=0):
         super(PopulatedCell, self).__init__(x, y)
