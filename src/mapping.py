@@ -70,6 +70,38 @@ class Map:
     def set_cell(self, x, y, cell_type):
         self.grid[y][x] = cell_type
 
+    def get_cell(self, x, y):
+        """
+        Returns the cell if populated
+        """
+        return self.get_cell_in(x, y, self.houses + self.vampires + self.werewolves)
+
+    def get_cell_in(self, x, y, array):
+        """
+        Returns the cell if in a given array
+        """
+        for cell in array:
+            if cell.get_pos == (x, y):
+                return cell
+
+    def get_pop(self, x, y):
+        """
+        Returns the population for a given cell
+        """
+        cell = self.get_cell(x, y)
+        return cell.population if cell else 0
+
+    def get_race(self, x, y):
+        """
+        Returns the population type for a given cell
+        """
+        if self.get_cell_in(x, y, self.houses):
+            return "humans"
+        elif self.get_cell_in(x, y, self.vampires):
+            return "vampires"
+        if self.get_cell_in(x, y, self.werewolves):
+            return "werewolves"
+
     def init_counts(self, cells_info):
         """
         Init the number of humans, vampires, and werewolves on the map.
