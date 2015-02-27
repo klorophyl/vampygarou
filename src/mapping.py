@@ -1,5 +1,6 @@
 # coding: utf-8
 from message import Colors
+from collections import namedtuple
 
 
 class Cell(object):
@@ -41,6 +42,9 @@ class Vampires(PopulatedCell):
 class Werewolves(PopulatedCell):
     def __str__(self):
         return Colors.BLUE + "W" + str(self.population) + Colors.END
+
+
+Move = namedtuple('Move', ['from_x', 'from_y', 'amount', 'to_x', 'to_y'])
 
 
 class Map:
@@ -85,13 +89,14 @@ class Map:
 
     def update_with_changes(self, changes):
         """
-        Update the number of humans, vampires, and werewolves on the map from changes sent by server.
+        Update the number of humans, vampires, and werewolves on the map from changes sent by
+        server.
         """
         for change in changes:
             # clean previous list from change
-            self.houses = [cell for cell in self.houses if cell.get_pos() != (change[0], change[1])]
-            self.vampires = [cell for cell in self.vampires if cell.get_pos() != (change[0], change[1])]
-            self.werewolves = [cell for cell in self.werewolves if cell.get_pos() != (change[0], change[1])]
+            self.houses = [h for h in self.houses if h.get_pos() != (change[0], change[1])]
+            self.vampires = [v for v in self.vampires if v.get_pos() != (change[0], change[1])]
+            self.werewolves = [w for w in self.werewolves if w.get_pos() != (change[0], change[1])]
 
             # apply change
             amount = change[2] or change[3] or change[4]
@@ -103,6 +108,10 @@ class Map:
             )
             if to_change is not None:
                 to_change.append(cell_type(change[0], change[1], amount))
+
+    def get_state_after_move(self, move):
+
+        return 0
 
     def _check_bounds(self, x, y, cell_type):
         if not 0 <= x < self.size_x:
