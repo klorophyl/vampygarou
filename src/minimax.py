@@ -1,9 +1,12 @@
 
-#  heuristique va utiliser les datas de la map pour générer
-#  une valeur pour chaque état
+#  wow Gab, much English, very comments
 
 
-def heuristique(state):
+def utility(state):
+    pass
+
+
+def terminal_test(state):
     pass
 
 
