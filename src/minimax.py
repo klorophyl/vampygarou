@@ -2,23 +2,23 @@
 #  wow Gab, much English, very comments
 
 
-def utility(state):
+def get_utility(state):
     pass
 
 
-def terminal_test(state):
+def is_terminal_test(state):
     pass
 
 
-def successors(state):
+def get_successors(state):
     pass
 
 
-def actions(state):
+def get_actions(state):
     pass
 
 
-def result(action, state):
+def get_result(action, state):
     pass
 
 
