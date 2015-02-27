@@ -26,7 +26,7 @@ def max_value(state):
     if terminal_test(state):
         return utility(state)
     else:
-        v = -1000
+        v = float("inf")*-1
         succ = successors(state)
         for action_state in succ:
             v = max(v, min_value(action_state[0]))
@@ -37,7 +37,7 @@ def min_value(state):
     if terminal_test(state):
         return utility(state)
     else:
-        v = 1000
+        v = float("inf")
         succ = successors(state)
         for action_state in succ:
             v = min(v, max_value(action_state[0]))
@@ -46,7 +46,10 @@ def min_value(state):
 
 def minimax(state):
     actions = actions(state)
-    v = -1000
+    v = float("inf")*-1
     for act in actions:
-        if min_value(result(act, state))
+        if min_value(result(act, state)) > v:
+            v = min_value(result(act, state))
+            act_to_play = act
+    return act_to_play
 
