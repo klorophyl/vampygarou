@@ -3,7 +3,7 @@ import random
 import itertools
 from datetime import datetime
 
-import minimax
+from minimax import Strategy
 from mapping import Cell, Move, Race
 
 
