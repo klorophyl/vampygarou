@@ -145,6 +145,12 @@ class Map:
 
         return 0
 
+    def get_werewolve_population(self):
+        return sum([w.population for w in self.werewolves])
+
+    def get_vampire_population(self):
+        return sum([v.population for v in self.vampires])
+
     def _check_bounds(self, x, y, cell_type):
         if not 0 <= x < self.size_x:
             raise ValueError(cell_type + " x outside bounds")

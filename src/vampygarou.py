@@ -25,6 +25,18 @@ class Vampygarou:
         else:
             self.race = "werewolve"
 
+    def get_enemy_population(self):
+        if self.race == "vampire":
+            self.map.get_werewolve_population()
+        else:
+            self.map.get_vampires_population()
+
+    def get_friend_population(self):
+        if self.race == "vampire":
+            self.map.get_vampire_population()
+        else:
+            self.map.get_werewolve_population()
+
     def get_cells(self):
         return self.map.vampires if self.race == 'vampire' else self.map.werewolves
 
