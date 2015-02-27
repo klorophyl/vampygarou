@@ -6,7 +6,7 @@ def get_utility(state):
     pass
 
 
-def is_terminal_test(state):
+def is_terminal(state):
     pass
 
 
@@ -23,33 +23,32 @@ def get_result(action, state):
 
 
 def max_value(state):
-    if is_terminal_test(state):
+    if is_terminal(state):
         return get_utility(state)
     else:
-        v = float("inf")*-1
+        value = -float("inf")
         succ = get_successors(state)
         for action_state in succ:
-            v = max(v, min_value(action_state[0]))
-    return v
+            value = max(value, min_value(action_state[0]))
+    return value
 
 
 def min_value(state):
-    if is_terminal_test(state):
+    if is_terminal(state):
         return get_utility(state)
     else:
-        v = float("inf")
+        value = float("inf")
         succ = get_successors(state)
         for action_state in succ:
-            v = min(v, max_value(action_state[0]))
-    return v
+            value = min(value, max_value(action_state[0]))
+    return value
 
 
 def minimax(state):
     actions = get_actions(state)
-    v = float("inf")*-1
+    value = float("inf")*-1
     for act in actions:
-        if min_value(get_result(act, state)) > v:
-            v = min_value(get_result(act, state))
+        if min_value(get_result(act, state)) > value:
+            value = min_value(get_result(act, state))
             act_to_play = act
     return act_to_play
-
