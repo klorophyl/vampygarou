@@ -113,6 +113,7 @@ class Vampygarou:
         for legal_cell in self.get_neighbor_cells_of(cell):
             legal_cell_race = self.map.get_race(legal_cell.x, legal_cell.y)
             legal_cell_pop = self.map.get_pop(legal_cell.x, legal_cell.y)
+            print legal_cell_pop
             for count in xrange(1, cell.population + 1):
                 if not (legal_cell_race != self.race and legal_cell_pop > count):
                     legal_unit_moves.append(Move(cell.x, cell.y, count, legal_cell.x, legal_cell.y))
