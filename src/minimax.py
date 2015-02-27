@@ -52,3 +52,30 @@ def minimax(state):
             value = min_value(get_result(act, state))
             act_to_play = act
     return act_to_play
+
+
+def get_alpha(state, alpha, beta):
+    if is_terminal(state):
+        return get_utility(state)
+    else:
+        value = -float("inf")
+        succ = get_successors(state)
+        count = 0
+        while count < succ.length and alpha < beta: 
+            value = max(value, min_value(action_state[0], alpha, beta))
+            alpha = max(value, alpha)
+            count++
+    return alpha
+
+
+def get_beta(state, alpha, beta):
+    if is_terminal(state):
+        return get_utility(state)
+    else:
+        value = float("inf")
+        succ = get_successors(state)
+        while count < succ.length and alpha < beta: 
+            value = min(value, max_value(action_state[0], alpha, beta))
+            beta = min(value, beta)
+            count++
+    return beta
