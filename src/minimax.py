@@ -61,10 +61,10 @@ def get_alpha(state, alpha, beta):
         value = -float("inf")
         succ = get_successors(state)
         count = 0
-        while count < succ.length and alpha < beta: 
+        while count < succ.length and alpha < beta:
             value = max(value, min_value(action_state[0], alpha, beta))
             alpha = max(value, alpha)
-            count++
+            count += 1
     return alpha
 
 
@@ -74,8 +74,9 @@ def get_beta(state, alpha, beta):
     else:
         value = float("inf")
         succ = get_successors(state)
-        while count < succ.length and alpha < beta: 
+        count = 0
+        while count < succ.length and alpha < beta:
             value = min(value, max_value(action_state[0], alpha, beta))
             beta = min(value, beta)
-            count++
+            count += 1
     return beta
