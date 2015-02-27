@@ -63,8 +63,9 @@ def get_alpha(state, alpha, beta):
         count = 0
         while count < succ.length and alpha < beta:
             value = max(value, min_value(succ(count), alpha, beta))
+
             alpha = max(value, alpha)
-            count++
+            count += 1
     return alpha
 
 
@@ -78,5 +79,5 @@ def get_beta(state, alpha, beta):
         while count < succ.length and alpha < beta:
             value = min(value, max_value(succ(count), alpha, beta))
             beta = min(value, beta)
-            count++
+            count += 1
     return beta
