@@ -1,5 +1,6 @@
 
 #  wow Gab, much English, very comments
+MAX_DEPTH = 4
 
 
 def get_utility(state):
@@ -22,25 +23,27 @@ def get_result(action, state):
     pass
 
 
-def max_value(state):
-    if is_terminal(state):
+def max_value(state, depth):
+    if depth == 0:
         return get_utility(state)
     else:
+        depth -= 1
         value = -float("inf")
         succ = get_successors(state)
         for action_state in succ:
-            value = max(value, min_value(action_state[0]))
+            value = max(value, min_value(action_state[0], depth))
     return value
 
 
-def min_value(state):
-    if is_terminal(state):
+def min_value(state, depth):
+    if depth == 0:
         return get_utility(state)
     else:
+        depth -= 1
         value = float("inf")
         succ = get_successors(state)
         for action_state in succ:
-            value = min(value, max_value(action_state[0]))
+            value = min(value, max_value(action_state[0], depth))
     return value
 
 
@@ -48,8 +51,8 @@ def minimax(state):
     actions = get_actions(state)
     value = float("inf")*-1
     for act in actions:
-        if min_value(get_result(act, state)) > value:
-            value = min_value(get_result(act, state))
+        if min_value(get_result(act, state), MAX_DEPTH) > value:
+            value = min_value(get_result(act, state), MAX_DEPTH)
             act_to_play = act
     return act_to_play
 
