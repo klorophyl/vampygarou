@@ -22,24 +22,12 @@ class Vampygarou:
 
     def retrieve_race(self):
         if self.map.home.get_pos() == self.map.vampires[0].get_pos():
-            self.race = Race.vampires
+            self.race = Race.VAMPIRES
         else:
-            self.race = Race.werewolves
-
-    def get_enemy_population(self):
-        if self.race == "vampire":
-            self.map.get_werewolve_population()
-        else:
-            self.map.get_vampires_population()
-
-    def get_friend_population(self):
-        if self.race == "vampire":
-            self.map.get_vampire_population()
-        else:
-            self.map.get_werewolve_population()
+            self.race = Race.WEREWOLVES
 
     def get_cells(self):
-        return self.map.vampires if self.race == Race.vampires else self.map.werewolves
+        return self.map.vampires if self.race == Race.VAMPIRES else self.map.werewolves
 
     def get_cell(self, x, y):
         cell = [cell for cell in self.get_cells() if cell.get_pos() == (x, y)]
@@ -116,7 +104,7 @@ class Vampygarou:
             legal_cell_pop = self.map.get_pop(legal_cell.x, legal_cell.y)
             print legal_cell_pop
             for count in xrange(1, cell.population + 1):
-                if check_rules_on_unit_move(legal_cell_race, legal_cell_pop, count):
+                if self.check_rules_on_unit_move(legal_cell_race, legal_cell_pop, count):
                     legal_unit_moves.append(Move(cell.x, cell.y, count, legal_cell.x, legal_cell.y))
 
         for length in xrange(1, total_pop + 1):

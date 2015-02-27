@@ -4,9 +4,9 @@ from collections import namedtuple
 
 
 class Race(object):
-    vampires = "vampires"
-    werewolves = "werewolves"
-    humans = "humans"
+    VAMPIRES = "vampires"
+    WEREWOLVES = "werewolves"
+    HUMANS = "humans"
 
 
 class Cell(object):
