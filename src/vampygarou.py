@@ -17,6 +17,7 @@ class Vampygarou:
         self.manual = manual
         self.map = None
         self.race = None
+        self.strategy = Strategy("feed")
         return
 
     def retrieve_race(self):
@@ -147,7 +148,7 @@ class Vampygarou:
         if self.manual:
             return self.get_manual_moves()
 
-        return self.get_random_moves()
+        return self.strategy.get_next_move()
 
     def get_manual_moves(self):
         """
@@ -176,6 +177,3 @@ class Vampygarou:
             legal_moves += self.get_legal_moves_for(cell)
 
         return list(random.choice(legal_moves))
-
-    def get_next_move(self):
-        return minimax.minimax(self.map)
