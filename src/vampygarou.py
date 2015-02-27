@@ -138,6 +138,9 @@ class Vampygarou:
         return moves
 
     def get_random_moves(self):
+        """
+        Choose a random moves in all legal moves
+        """
         legal_moves = []
         for cell in self.get_cells():
             legal_moves += self.get_legal_moves_for(cell)
