@@ -1,8 +1,10 @@
 # coding: utf-8
 import random
 import itertools
+from datetime import datetime
 
-from mapping import Cell
+import minimax
+from mapping import Cell, Move
 
 
 class Vampygarou:
@@ -61,23 +63,23 @@ class Vampygarou:
 
         return legal_cells
 
-    def is_move_legal(self, move):
+    def is_turn_legal(self, turn):
         """
         Return if move is legal ie to neighbor and not to many peons moved
         """
         cell_pop = {}   # monitor count for cell in move
-        for cell_move in move:
-            if abs(cell_move[0] - cell_move[3]) > 1 or abs(cell_move[1] - cell_move[4]) > 1:
+        for move in turn:
+            if abs(move.from_x - move.to_x) > 1 or abs(move.from_y - move.to_y) > 1:
                 # destination is not neighbor
                 return False
 
             # increase pop count
-            if not cell_pop.get(cell_move[0]):
-                cell_pop[cell_move[0]] = {}
-            if not cell_pop[cell_move[0]].get(cell_move[1]):
-                cell_pop[cell_move[0]][cell_move[1]] = 0
+            if not cell_pop.get(move.from_x):
+                cell_pop[move.from_x] = {}
+            if not cell_pop[move.from_x].get(move.from_y):
+                cell_pop[move.from_x][move.from_y] = 0
 
-            cell_pop[cell_move[0]][cell_move[1]] += cell_move[2]
+            cell_pop[move.from_x][move.from_y] += move.amount
 
         for x, temp in cell_pop.iteritems():
             for y, count in temp.iteritems():
@@ -94,16 +96,20 @@ class Vampygarou:
         legal_moves = []
         total_pop = sum(cell.population for cell in self.get_cells())
 
-        for legal_cell in self.get_neighbor_cells_of(cell):
-            for count in range(1, cell.population + 1):
-                legal_unit_moves.append([cell.x, cell.y, count, legal_cell.x, legal_cell.y])
+        now = datetime.now()
 
-        for length in range(1, total_pop + 1):
+        for legal_cell in self.get_neighbor_cells_of(cell):
+            for count in xrange(1, cell.population + 1):
+                legal_unit_moves.append(Move(cell.x, cell.y, count, legal_cell.x, legal_cell.y))
+
+        for length in xrange(1, total_pop + 1):
             # you cant make more moves than your total population
             # WARNING : this loop won't work when total pop is high (combination ftw)
             for move in itertools.combinations(legal_unit_moves, length):
-                if self.is_move_legal(move):
+                if self.is_turn_legal(move):
                     legal_moves.append(move)
+
+        print datetime.now() - now
 
         return legal_moves
 
@@ -146,3 +152,6 @@ class Vampygarou:
             legal_moves += self.get_legal_moves_for(cell)
 
         return list(random.choice(legal_moves))
+
+    def get_next_move(self):
+        return minimax.minimax(self.map)

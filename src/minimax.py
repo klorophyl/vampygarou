@@ -3,7 +3,7 @@
 
 
 def utility(state):
-    pass
+    return 0
 
 
 def terminal_test(state):
@@ -11,7 +11,7 @@ def terminal_test(state):
 
 
 def max_value(state):
-    if state.successors.size = 0:
+    if state.successors.size == 0:
         return heuristique(state)
     else:
         h = 0
