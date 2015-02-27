@@ -3,32 +3,50 @@
 
 
 def utility(state):
-    return 0
+    pass
 
 
 def terminal_test(state):
     pass
 
 
-def max_value(state):
-    if state.successors.size == 0:
-        return heuristique(state)
-    else:
-        h = 0
-        for action in Actions:
-            if heuristique(state.act(action)) > h:
-                h = heuristique(state.act(action))
-                action_to_play = action
-        return heuristique
-
-
-def min_value():
+def successors(state):
     pass
 
 
-def minimax():
-    return "chibre"
+def actions(state):
+    pass
 
 
-def act(state, action):
-    return Actions[state]
+def result(action, state):
+    pass
+
+
+def max_value(state):
+    if terminal_test(state):
+        return utility(state)
+    else:
+        v = -1000
+        succ = successors(state)
+        for action_state in succ:
+            v = max(v, min_value(action_state[0]))
+    return v
+
+
+def min_value(state):
+    if terminal_test(state):
+        return utility(state)
+    else:
+        v = 1000
+        succ = successors(state)
+        for action_state in succ:
+            v = min(v, max_value(action_state[0]))
+    return v
+
+
+def minimax(state):
+    actions = actions(state)
+    v = -1000
+    for act in actions:
+        if min_value(result(act, state))
+
