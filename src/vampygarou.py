@@ -4,7 +4,7 @@ import itertools
 from datetime import datetime
 
 import minimax
-from mapping import Cell, Move
+from mapping import Cell, Move, Race
 
 
 class Vampygarou:
@@ -21,12 +21,12 @@ class Vampygarou:
 
     def retrieve_race(self):
         if self.map.home.get_pos() == self.map.vampires[0].get_pos():
-            self.race = "vampire"
+            self.race = Race.vampires
         else:
-            self.race = "werewolve"
+            self.race = Race.werewolves
 
     def get_cells(self):
-        return self.map.vampires if self.race == 'vampire' else self.map.werewolves
+        return self.map.vampires if self.race == Race.vampires else self.map.werewolves
 
     def get_cell(self, x, y):
         cell = [cell for cell in self.get_cells() if cell.get_pos() == (x, y)]
@@ -99,8 +99,11 @@ class Vampygarou:
         now = datetime.now()
 
         for legal_cell in self.get_neighbor_cells_of(cell):
+            legal_cell_race = self.map.get_race(legal_cell.x, legal_cell.y)
+            legal_cell_pop = self.map.get_pop(legal_cell.x, legal_cell.y)
             for count in xrange(1, cell.population + 1):
-                legal_unit_moves.append(Move(cell.x, cell.y, count, legal_cell.x, legal_cell.y))
+                if not (legal_cell_race != self.race and legal_cell_pop > count):
+                    legal_unit_moves.append(Move(cell.x, cell.y, count, legal_cell.x, legal_cell.y))
 
         for length in xrange(1, total_pop + 1):
             # you cant make more moves than your total population
