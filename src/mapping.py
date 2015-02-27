@@ -3,6 +3,12 @@ from message import Colors
 from collections import namedtuple
 
 
+class Race(object):
+    vampires = "vampires"
+    werewolves = "werewolves"
+    humans = "humans"
+
+
 class Cell(object):
     """
     A cell
@@ -96,11 +102,11 @@ class Map:
         Returns the population type for a given cell
         """
         if self.get_cell_in(x, y, self.houses):
-            return "humans"
+            return Race.humans
         elif self.get_cell_in(x, y, self.vampires):
-            return "vampires"
+            return Race.vampires
         if self.get_cell_in(x, y, self.werewolves):
-            return "werewolves"
+            return Race.werewolves
 
     def init_counts(self, cells_info):
         """
