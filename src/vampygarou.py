@@ -113,8 +113,9 @@ class Vampygarou:
         for legal_cell in self.get_neighbor_cells_of(cell):
             legal_cell_race = self.map.get_race(legal_cell.x, legal_cell.y)
             legal_cell_pop = self.map.get_pop(legal_cell.x, legal_cell.y)
+            print legal_cell_pop
             for count in xrange(1, cell.population + 1):
-                if not (legal_cell_race != self.race and legal_cell_pop > count):
+                if check_rules_on_unit_move(legal_cell_race, legal_cell_pop, count):
                     legal_unit_moves.append(Move(cell.x, cell.y, count, legal_cell.x, legal_cell.y))
 
         for length in xrange(1, total_pop + 1):
@@ -127,6 +128,14 @@ class Vampygarou:
         print datetime.now() - now
 
         return legal_moves
+
+    def check_rules_on_unit_move(self, cell_race, cell_pop, move_pop):
+        """
+        Check a set of rules to discriminate cells
+        """
+        if cell_race != self.race and cell_pop > move_pop:
+            return False
+        return True
 
     def get_moves(self):
         """

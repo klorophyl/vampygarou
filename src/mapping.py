@@ -87,7 +87,7 @@ class Map:
         Returns the cell if in a given array
         """
         for cell in array:
-            if cell.get_pos == (x, y):
+            if cell.get_pos() == (x, y):
                 return cell
 
     def get_pop(self, x, y):
