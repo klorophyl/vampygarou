@@ -1,1 +1,1 @@
-python src/main.py $@
+python src/main.py $@ -ip 192.168.56.101

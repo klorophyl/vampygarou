@@ -24,9 +24,6 @@ class Vampygarou:
         else:
             self.race = Race.WEREWOLVES
 
-    def update(self):
-        return
-
     def get_moves(self):
         """
         Function returning the next moves

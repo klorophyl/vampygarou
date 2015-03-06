@@ -173,19 +173,19 @@ class Map:
             legal_cells.append(Cell(cell.x - 1, cell.y))
         if cell.y > 0:
             legal_cells.append(Cell(cell.x, cell.y - 1))
-        if cell.x < self.map.size_x - 1:
+        if cell.x < self.size_x - 1:
             legal_cells.append(Cell(cell.x + 1, cell.y))
-        if cell.y < self.map.size_y - 1:
+        if cell.y < self.size_y - 1:
             legal_cells.append(Cell(cell.x, cell.y + 1))
 
         # diagonal directions
         if cell.x > 0 and cell.y > 0:
             legal_cells.append(Cell(cell.x - 1, cell.y - 1))
-        if cell.x < self.map.size_x - 1 and cell.y > 0:
+        if cell.x < self.size_x - 1 and cell.y > 0:
             legal_cells.append(Cell(cell.x + 1, cell.y - 1))
-        if cell.x > 0 and cell.y < self.map.size_y - 1:
+        if cell.x > 0 and cell.y < self.size_y - 1:
             legal_cells.append(Cell(cell.x - 1, cell.y + 1))
-        if cell.x < self.map.size_x - 1 and cell.y < self.map.size_y - 1:
+        if cell.x < self.size_x - 1 and cell.y < self.size_y - 1:
             legal_cells.append(Cell(cell.x + 1, cell.y + 1))
 
         return legal_cells

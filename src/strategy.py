@@ -1,6 +1,7 @@
 #  wow Gab, much English, very comment
 from copy import copy
 import itertools
+import random
 from mapping import Move, Race
 
 
@@ -49,12 +50,12 @@ class Strategy(object):
             # you cant make more moves than your total population
             # WARNING : this loop won't work when total pop is high (combination ftw)
             for move in itertools.combinations(legal_unit_moves, length):
-                if self.is_turn_legal(move):
+                if self.is_turn_legal(move, state):
                     legal_moves.append(move)
 
         return legal_moves
 
-    def is_turn_legal(self, turn):
+    def is_turn_legal(self, turn, state):
         """
         Return if move is legal ie to neighbor and not to many peons moved
         """
@@ -100,9 +101,9 @@ class Strategy(object):
         """
         result = []
         cells = state.vampires if self.race == Race.VAMPIRES else state.werewolves
-        possibilities = [self.get_actions_for_cell(cell) for cell in cells]
+        possibilities = [self.get_actions_for_cell(cell, state) for cell in cells]
 
-        for length in xrange(1, len(cells)):
+        for length in xrange(len(cells)):
             for move in itertools.combinations(possibilities, length):
                 result.append(move)
 
