@@ -102,11 +102,11 @@ class Map:
         Returns the population type for a given cell
         """
         if self.get_cell_in(x, y, self.houses):
-            return Race.humans
+            return Race.HUMANS
         elif self.get_cell_in(x, y, self.vampires):
-            return Race.vampires
+            return Race.VAMPIRES
         if self.get_cell_in(x, y, self.werewolves):
-            return Race.werewolves
+            return Race.WEREWOLVES
 
     def init_counts(self, cells_info):
         """

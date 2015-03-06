@@ -81,7 +81,7 @@ class Strategy(object):
         Return best action according to minimax on a given state and race
         """
         actions = self.get_actions(state)
-        value = float("inf")*-1
+        value = -float("inf")
         for act in actions:
             if self.min_value(self.get_result(act, state), Strategy.MAX_DEPTH) > value:
                 value = self.min_value(self.get_result(act, state), Strategy.MAX_DEPTH)
