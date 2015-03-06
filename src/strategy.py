@@ -1,5 +1,7 @@
 #  wow Gab, much English, very comment
 
+from mapping import Move
+
 
 class Strategy(object):
     MAX_DEPTH = 4
@@ -27,6 +29,39 @@ class Strategy(object):
         """
         return state.get_werewolve_population() == 0 or state.get_vampire_population() == 0
 
+    def get_actions_for_cell(self, cell, state):
+        """
+        Returns a list of possible actions on a given cell
+        """
+        legal_unit_moves = []
+        legal_moves = []
+
+        for legal_cell in state.get_neighbor_cells_of(cell):
+            legal_cell_race = state.get_race(legal_cell.x, legal_cell.y)
+            legal_cell_pop = state.get_pop(legal_cell.x, legal_cell.y)
+
+            for count in xrange(1, cell.population + 1):
+                if self.check_rules_on_unit_move(legal_cell_race, legal_cell_pop, count):
+                    legal_unit_moves.append(Move(cell.x, cell.y, count, legal_cell.x, legal_cell.y))
+
+        for length in xrange(1, cell + 1):
+            # you cant make more moves than your total population
+            # WARNING : this loop won't work when total pop is high (combination ftw)
+            for move in itertools.combinations(legal_unit_moves, length):
+                if self.is_turn_legal(move):
+                    legal_moves.append(move)
+
+        return legal_moves
+
+    def check_rules_on_unit_move(self, cell_race, cell_pop, move_pop):
+        """
+        Check a set of rules to discriminate cells
+        """
+        # TBM
+        if cell_race != self.race and cell_pop > move_pop:
+            return False
+        return True
+
     def get_successors(self, state):
         """
         Returns possible successors to a given state
@@ -37,6 +72,8 @@ class Strategy(object):
         """
         Returns a list of possible actions on a given state
         """
+        cells = state.vampires if self.race == Race.VAMPIRES else state.werewolves
+        total_pop = sum(cell.population for cell in state.get_cells())
         pass
 
     def get_result(self, action, state):

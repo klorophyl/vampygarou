@@ -3,7 +3,7 @@ import random
 import itertools
 from datetime import datetime
 
-from minimax import Strategy
+from strategy import Strategy
 from mapping import Cell, Move, Race
 
 
@@ -27,7 +27,7 @@ class Vampygarou:
             self.race = Race.WEREWOLVES
 
     def get_cells(self):
-        return self.map.vampires if self.race == Race.VAMPIRES else self.map.werewolves
+        return
 
     def get_cell(self, x, y):
         cell = [cell for cell in self.get_cells() if cell.get_pos() == (x, y)]
@@ -35,34 +35,6 @@ class Vampygarou:
 
     def update(self):
         return
-
-    def get_neighbor_cells_of(self, cell):
-        """
-        Returns a list of possible cells
-        """
-        legal_cells = []
-
-        # straight directions
-        if cell.x > 0:
-            legal_cells.append(Cell(cell.x - 1, cell.y))
-        if cell.y > 0:
-            legal_cells.append(Cell(cell.x, cell.y - 1))
-        if cell.x < self.map.size_x - 1:
-            legal_cells.append(Cell(cell.x + 1, cell.y))
-        if cell.y < self.map.size_y - 1:
-            legal_cells.append(Cell(cell.x, cell.y + 1))
-
-        # diagonal directions
-        if cell.x > 0 and cell.y > 0:
-            legal_cells.append(Cell(cell.x - 1, cell.y - 1))
-        if cell.x < self.map.size_x - 1 and cell.y > 0:
-            legal_cells.append(Cell(cell.x + 1, cell.y - 1))
-        if cell.x > 0 and cell.y < self.map.size_y - 1:
-            legal_cells.append(Cell(cell.x - 1, cell.y + 1))
-        if cell.x < self.map.size_x - 1 and cell.y < self.map.size_y - 1:
-            legal_cells.append(Cell(cell.x + 1, cell.y + 1))
-
-        return legal_cells
 
     def is_turn_legal(self, turn):
         """
@@ -87,43 +59,6 @@ class Vampygarou:
                 if count > self.get_cell(x, y).population:
                     return False
 
-        return True
-
-    def get_legal_moves_for(self, cell):
-        """
-        Returns a list of possible moves
-        """
-        legal_unit_moves = []
-        legal_moves = []
-        total_pop = sum(cell.population for cell in self.get_cells())
-
-        now = datetime.now()
-
-        for legal_cell in self.get_neighbor_cells_of(cell):
-            legal_cell_race = self.map.get_race(legal_cell.x, legal_cell.y)
-            legal_cell_pop = self.map.get_pop(legal_cell.x, legal_cell.y)
-            print legal_cell_pop
-            for count in xrange(1, cell.population + 1):
-                if self.check_rules_on_unit_move(legal_cell_race, legal_cell_pop, count):
-                    legal_unit_moves.append(Move(cell.x, cell.y, count, legal_cell.x, legal_cell.y))
-
-        for length in xrange(1, total_pop + 1):
-            # you cant make more moves than your total population
-            # WARNING : this loop won't work when total pop is high (combination ftw)
-            for move in itertools.combinations(legal_unit_moves, length):
-                if self.is_turn_legal(move):
-                    legal_moves.append(move)
-
-        print datetime.now() - now
-
-        return legal_moves
-
-    def check_rules_on_unit_move(self, cell_race, cell_pop, move_pop):
-        """
-        Check a set of rules to discriminate cells
-        """
-        if cell_race != self.race and cell_pop > move_pop:
-            return False
         return True
 
     def get_moves(self):

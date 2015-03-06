@@ -162,6 +162,34 @@ class Map:
         """
         return sum([v.population for v in self.vampires])
 
+    def get_neighbor_cells_of(self, cell):
+        """
+        Returns a list of possible cells
+        """
+        legal_cells = []
+
+        # straight directions
+        if cell.x > 0:
+            legal_cells.append(Cell(cell.x - 1, cell.y))
+        if cell.y > 0:
+            legal_cells.append(Cell(cell.x, cell.y - 1))
+        if cell.x < self.map.size_x - 1:
+            legal_cells.append(Cell(cell.x + 1, cell.y))
+        if cell.y < self.map.size_y - 1:
+            legal_cells.append(Cell(cell.x, cell.y + 1))
+
+        # diagonal directions
+        if cell.x > 0 and cell.y > 0:
+            legal_cells.append(Cell(cell.x - 1, cell.y - 1))
+        if cell.x < self.map.size_x - 1 and cell.y > 0:
+            legal_cells.append(Cell(cell.x + 1, cell.y - 1))
+        if cell.x > 0 and cell.y < self.map.size_y - 1:
+            legal_cells.append(Cell(cell.x - 1, cell.y + 1))
+        if cell.x < self.map.size_x - 1 and cell.y < self.map.size_y - 1:
+            legal_cells.append(Cell(cell.x + 1, cell.y + 1))
+
+        return legal_cells
+
     def _check_bounds(self, x, y, cell_type):
         """
         Raises if cell is on boundary
