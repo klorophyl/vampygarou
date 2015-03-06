@@ -28,7 +28,7 @@ class Strategy(object):
         """
         Returns bool if the state is terminal
         """
-        pass
+        return (state.get_werewolve_population == 0) or (state.get_vampire_population == 0)
 
     def get_successors(self, state):
         """
