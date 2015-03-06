@@ -18,17 +18,14 @@ class Strategy(object):
         """
         Returns the heuristic
         """
-        utility = state.get_vampire_population - state.get_werewolve_population
-        if race == "vampires":
-            return utility
-        else:
-            return -utility
+        utility = state.get_vampire_population() - state.get_werewolve_population()
+        return (1 if race == "vampires" else -1) * utility
 
     def is_terminal(self, state):
         """
         Returns bool if the state is terminal
         """
-        return (state.get_werewolve_population() == 0) or (state.get_vampire_population() == 0)
+        return state.get_werewolve_population() == 0 or state.get_vampire_population() == 0
 
     def get_successors(self, state):
         """
