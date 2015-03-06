@@ -11,11 +11,11 @@ class Strategy(object):
         self.race = race
         return
 
-    def get_next_move(self):
+    def get_next_move(self, state):
         """
         Returns the chosen move
         """
-        return None
+        return list(random.choice(self.get_actions(state)))
 
     def get_utility(self, state, race):
         """
@@ -45,7 +45,7 @@ class Strategy(object):
                 if self.check_rules_on_unit_move(legal_cell_race, legal_cell_pop, count):
                     legal_unit_moves.append(Move(cell.x, cell.y, count, legal_cell.x, legal_cell.y))
 
-        for length in xrange(1, cell + 1):
+        for length in xrange(1, cell.population + 1):
             # you cant make more moves than your total population
             # WARNING : this loop won't work when total pop is high (combination ftw)
             for move in itertools.combinations(legal_unit_moves, length):
@@ -53,6 +53,31 @@ class Strategy(object):
                     legal_moves.append(move)
 
         return legal_moves
+
+    def is_turn_legal(self, turn):
+        """
+        Return if move is legal ie to neighbor and not to many peons moved
+        """
+        cell_pop = {}   # monitor count for cell in move
+        for move in turn:
+            if abs(move.from_x - move.to_x) > 1 or abs(move.from_y - move.to_y) > 1:
+                # destination is not neighbor
+                return False
+
+            # increase pop count
+            if not cell_pop.get(move.from_x):
+                cell_pop[move.from_x] = {}
+            if not cell_pop[move.from_x].get(move.from_y):
+                cell_pop[move.from_x][move.from_y] = 0
+
+            cell_pop[move.from_x][move.from_y] += move.amount
+
+        for x, temp in cell_pop.iteritems():
+            for y, count in temp.iteritems():
+                if count > state.get_pop(x, y):
+                    return False
+
+        return True
 
     def check_rules_on_unit_move(self, cell_race, cell_pop, move_pop):
         """
@@ -73,9 +98,15 @@ class Strategy(object):
         """
         Returns a list of possible actions on a given state
         """
+        result = []
         cells = state.vampires if self.race == Race.VAMPIRES else state.werewolves
-        total_pop = sum(cell.population for cell in state.get_cells())
-        pass
+        possibilities = [self.get_actions_for_cell(cell) for cell in cells]
+
+        for length in xrange(1, len(cells)):
+            for move in itertools.combinations(possibilities, length):
+                result.append(move)
+
+        return result
 
     def get_result(self, action, state):
         """

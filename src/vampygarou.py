@@ -24,40 +24,8 @@ class Vampygarou:
         else:
             self.race = Race.WEREWOLVES
 
-    def get_cells(self):
-        return
-
-    def get_cell(self, x, y):
-        cell = [cell for cell in self.get_cells() if cell.get_pos() == (x, y)]
-        return cell[0] if cell else None
-
     def update(self):
         return
-
-    def is_turn_legal(self, turn):
-        """
-        Return if move is legal ie to neighbor and not to many peons moved
-        """
-        cell_pop = {}   # monitor count for cell in move
-        for move in turn:
-            if abs(move.from_x - move.to_x) > 1 or abs(move.from_y - move.to_y) > 1:
-                # destination is not neighbor
-                return False
-
-            # increase pop count
-            if not cell_pop.get(move.from_x):
-                cell_pop[move.from_x] = {}
-            if not cell_pop[move.from_x].get(move.from_y):
-                cell_pop[move.from_x][move.from_y] = 0
-
-            cell_pop[move.from_x][move.from_y] += move.amount
-
-        for x, temp in cell_pop.iteritems():
-            for y, count in temp.iteritems():
-                if count > self.get_cell(x, y).population:
-                    return False
-
-        return True
 
     def get_moves(self):
         """
@@ -69,7 +37,7 @@ class Vampygarou:
         if self.manual:
             return self.get_manual_moves()
 
-        return self.strategy.get_next_move()
+        return self.strategy.get_next_move(self.map)
 
     def get_manual_moves(self):
         """
