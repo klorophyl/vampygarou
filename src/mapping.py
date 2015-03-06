@@ -1,6 +1,5 @@
 # coding: utf-8
 from message import Colors
-from collections import namedtuple
 
 
 class Race(object):

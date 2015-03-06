@@ -15,16 +15,14 @@ class Strategy(object):
         """
         Returns the chosen move
         """
-        move = random.choice(self.get_actions(state))
-        print move
-        return move
+        return self.minimax(state, self.race)
 
-    def get_utility(self, state, race):
+    def get_utility(self, state):
         """
         Returns the heuristic
         """
         utility = state.get_vampire_population() - state.get_werewolve_population()
-        return (1 if race == Race.VAMPIRES else -1) * utility
+        return (1 if self.race == Race.VAMPIRES else -1) * utility
 
     def is_terminal(self, state):
         """
@@ -34,8 +32,7 @@ class Strategy(object):
 
     def get_actions_for_cell(self, cell, state):
         """
-        Returns a list of possible actions on a given cell
-        (list of list of Move)
+        Returns a list of possible actions on a given cell (list of Turn)
         """
         legal_unit_moves = []
         legal_turns = []
@@ -52,18 +49,18 @@ class Strategy(object):
         for length in xrange(1, cell.population + 1):
             # you can't make more moves than your total population
             # WARNING : this loop won't work when total pop is high (combination ftw)
-            for turn in itertools.combinations(legal_unit_moves, length):
-                if self.is_turn_legal(turn, state):
-                    legal_turns.append(list(turn))
+            for moves in itertools.combinations(legal_unit_moves, length):
+                if self.is_turn_legal(moves, state):
+                    legal_turns.append(list(moves))
 
         return legal_turns
 
-    def is_turn_legal(self, turn, state):
+    def is_turn_legal(self, moves, state):
         """
         Return if move is legal i.e. to neighbor and not too many peons moved
         """
         cell_pop = {}  # monitor count for cell in move
-        for move in turn:
+        for move in moves:
             if abs(move.from_x - move.to_x) > 1 or abs(move.from_y - move.to_y) > 1:
                 # destination is not neighbor
                 return False
@@ -96,7 +93,7 @@ class Strategy(object):
         """
         Returns possible successors to a given state
         """
-        return [self.get_result(action, state) for action in self.get_actions()]
+        return [self.get_result(action, state) for action in self.get_actions(state)]
 
     def get_actions(self, state):
         """
@@ -110,17 +107,29 @@ class Strategy(object):
             for move in itertools.combinations(possibilities, length):
                 result.append(list(move))
 
-        return result[0][0]  # TODO understand this
+        return random.choice(random.choice(result))
 
     def get_result(self, action, state):
         """
         Returns state resulting of applying given action on given state
         """
         new_state = copy(state)
-        for move in action:
-            new_state.apply_move(move)
+        new_state.update_with_changes([[m.from_x, m.from_y, m.amount, m.to_x, m.to_y] for m in action])
 
         return new_state
+
+    def minimax(self, state, race):
+        """
+        Return best action according to minimax on a given state and race
+        """
+        actions = self.get_actions(state)
+        value = -float("inf")
+        for action in actions:
+            if self.min_value(self.get_result(action, state), Strategy.MAX_DEPTH) > value:
+                value = self.min_value(self.get_result(action, state), Strategy.MAX_DEPTH)
+                action_to_play = action
+
+        return action_to_play
 
     def max_value(self, state, depth):
         """
@@ -133,7 +142,7 @@ class Strategy(object):
             value = -float("inf")
             succ = self.get_successors(state)
             for action_state in succ:
-                value = max(value, self.min_value(action_state[0], depth))
+                value = max(value, self.min_value(action_state, depth))
         return value
 
     def min_value(self, state, depth):
@@ -147,20 +156,8 @@ class Strategy(object):
             value = float("inf")
             succ = self.get_successors(state)
             for action_state in succ:
-                value = min(value, self.max_value(action_state[0], depth))
+                value = min(value, self.max_value(action_state, depth))
         return value
-
-    def minimax(self, state, race):
-        """
-        Return best action according to minimax on a given state and race
-        """
-        actions = self.get_actions(state)
-        value = -float("inf")
-        for act in actions:
-            if self.min_value(self.get_result(act, state), Strategy.MAX_DEPTH) > value:
-                value = self.min_value(self.get_result(act, state), Strategy.MAX_DEPTH)
-                act_to_play = act
-        return act_to_play
 
     def get_alpha(self, state, depth, alpha, beta):
         """

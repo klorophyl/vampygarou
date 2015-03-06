@@ -52,7 +52,7 @@ class Server:
         """
         Send moves to server
 
-        param:  list of Move
+        param:  Turn object
         """
         server_moves = [[m.from_x, m.from_y, m.amount, m.to_x, m.to_y] for m in moves]
         self._send_message("MOV", len(server_moves), *itertools.chain(*server_moves))
