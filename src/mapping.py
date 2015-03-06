@@ -148,16 +148,24 @@ class Map:
                 to_change.append(cell_type(change[0], change[1], amount))
 
     def get_state_after_move(self, move):
-
         return 0
 
     def get_werewolve_population(self):
+        """
+        Returns total werewolves pop
+        """
         return sum([w.population for w in self.werewolves])
 
     def get_vampire_population(self):
+        """
+        Returns total vampires pop
+        """
         return sum([v.population for v in self.vampires])
 
     def _check_bounds(self, x, y, cell_type):
+        """
+        Raises if cell is on boundary
+        """
         if not 0 <= x < self.size_x:
             raise ValueError(cell_type + " x outside bounds")
         if not 0 <= y < self.size_y:
