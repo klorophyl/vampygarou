@@ -34,7 +34,7 @@ class Strategy(object):
         """
         Returns possible successors to a given state
         """
-        pass
+        return [self.get_result(action, state) for action in self.get_actions()]
 
     def get_actions(self, state):
         """
@@ -108,7 +108,7 @@ class Strategy(object):
 
     def get_beta(self, state, depth, alpha, beta):
         """
-        Returns the beta of a given state with given depth, alpha beta
+        Returns the alpha of a given state with given depth, alpha beta
         """
         if depth == 0 or self.is_terminal(state):
             return self.get_utility(state)
