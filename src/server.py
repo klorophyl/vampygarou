@@ -48,13 +48,14 @@ class Server:
 
         return None
 
-    def send_moves(self, *moves):
+    def send_moves(self, moves):
         """
         Send moves to server
 
-        param:  moves ([[x, x, x, x, x], [y, y, y, y, y], [z, z, z, z] ...])
+        param:  list of Move
         """
-        self._send_message("MOV", len(moves), *itertools.chain(*moves))
+        server_moves = [[m.from_x, m.from_y, m.amount, m.to_x, m.to_y] for m in moves]
+        self._send_message("MOV", len(server_moves), *itertools.chain(*server_moves))
 
     def close(self):
         self._sock.close()

@@ -24,6 +24,9 @@ class Cell(object):
     def get_pos(self):
         return (self.x, self.y)
 
+    def __repr__(self):
+        return "<Cell {}, {}>".format(self.x, self.y)
+
 
 class PopulatedCell(Cell):
     def __init__(self, x, y, population=0):
@@ -50,7 +53,21 @@ class Werewolves(PopulatedCell):
         return Colors.BLUE + "W" + str(self.population) + Colors.END
 
 
-Move = namedtuple('Move', ['from_x', 'from_y', 'amount', 'to_x', 'to_y'])
+class Move(object):
+    """
+    A move
+    """
+    def __init__(self, from_x, from_y, amount, to_x, to_y):
+        self.from_x = from_x
+        self.from_y = from_y
+        self.amount = amount
+        self.to_x = to_x
+        self.to_y = to_y
+
+    def __repr__(self):
+        return "<Move {} ({}, {}) => ({}, {})>".format(
+            self.amount, self.from_x, self.from_y, self.to_x, self.to_y
+        )
 
 
 class Map:
@@ -168,25 +185,11 @@ class Map:
         """
         legal_cells = []
 
-        # straight directions
-        if cell.x > 0:
-            legal_cells.append(Cell(cell.x - 1, cell.y))
-        if cell.y > 0:
-            legal_cells.append(Cell(cell.x, cell.y - 1))
-        if cell.x < self.size_x - 1:
-            legal_cells.append(Cell(cell.x + 1, cell.y))
-        if cell.y < self.size_y - 1:
-            legal_cells.append(Cell(cell.x, cell.y + 1))
-
-        # diagonal directions
-        if cell.x > 0 and cell.y > 0:
-            legal_cells.append(Cell(cell.x - 1, cell.y - 1))
-        if cell.x < self.size_x - 1 and cell.y > 0:
-            legal_cells.append(Cell(cell.x + 1, cell.y - 1))
-        if cell.x > 0 and cell.y < self.size_y - 1:
-            legal_cells.append(Cell(cell.x - 1, cell.y + 1))
-        if cell.x < self.size_x - 1 and cell.y < self.size_y - 1:
-            legal_cells.append(Cell(cell.x + 1, cell.y + 1))
+        for x in range(-1, 2):
+            for y in range(-1, 2):
+                if 0 < cell.x + x < self.size_x and 0 < cell.y + y < self.size_y \
+                        and not (x == 0 and y == 0):
+                    legal_cells.append(Cell(cell.x + x, cell.y + y))
 
         return legal_cells
 

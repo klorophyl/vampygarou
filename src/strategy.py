@@ -10,20 +10,21 @@ class Strategy(object):
 
     def __init__(self, race):
         self.race = race
-        return
 
     def get_next_move(self, state):
         """
         Returns the chosen move
         """
-        return list(random.choice(self.get_actions(state)))
+        move = random.choice(self.get_actions(state))
+        print move
+        return move
 
     def get_utility(self, state, race):
         """
         Returns the heuristic
         """
         utility = state.get_vampire_population() - state.get_werewolve_population()
-        return (1 if race == "vampires" else -1) * utility
+        return (1 if race == Race.VAMPIRES else -1) * utility
 
     def is_terminal(self, state):
         """
@@ -34,32 +35,34 @@ class Strategy(object):
     def get_actions_for_cell(self, cell, state):
         """
         Returns a list of possible actions on a given cell
+        (list of list of Move)
         """
         legal_unit_moves = []
-        legal_moves = []
+        legal_turns = []
 
-        for legal_cell in state.get_neighbor_cells_of(cell):
-            legal_cell_race = state.get_race(legal_cell.x, legal_cell.y)
-            legal_cell_pop = state.get_pop(legal_cell.x, legal_cell.y)
+        for neighbor in state.get_neighbor_cells_of(cell):
+            neighbor_race = state.get_race(neighbor.x, neighbor.y)
+            neighbor_pop = state.get_pop(neighbor.x, neighbor.y)
 
+            # /!\ only move everyone for now
             for count in xrange(1, cell.population + 1):
-                if self.check_rules_on_unit_move(legal_cell_race, legal_cell_pop, count):
-                    legal_unit_moves.append(Move(cell.x, cell.y, count, legal_cell.x, legal_cell.y))
+                if self.check_rules_on_unit_move(neighbor_race, neighbor_pop, count):
+                    legal_unit_moves.append(Move(cell.x, cell.y, count, neighbor.x, neighbor.y))
 
         for length in xrange(1, cell.population + 1):
-            # you cant make more moves than your total population
+            # you can't make more moves than your total population
             # WARNING : this loop won't work when total pop is high (combination ftw)
-            for move in itertools.combinations(legal_unit_moves, length):
-                if self.is_turn_legal(move, state):
-                    legal_moves.append(move)
+            for turn in itertools.combinations(legal_unit_moves, length):
+                if self.is_turn_legal(turn, state):
+                    legal_turns.append(list(turn))
 
-        return legal_moves
+        return legal_turns
 
     def is_turn_legal(self, turn, state):
         """
-        Return if move is legal ie to neighbor and not to many peons moved
+        Return if move is legal i.e. to neighbor and not too many peons moved
         """
-        cell_pop = {}   # monitor count for cell in move
+        cell_pop = {}  # monitor count for cell in move
         for move in turn:
             if abs(move.from_x - move.to_x) > 1 or abs(move.from_y - move.to_y) > 1:
                 # destination is not neighbor
@@ -103,11 +106,11 @@ class Strategy(object):
         cells = state.vampires if self.race == Race.VAMPIRES else state.werewolves
         possibilities = [self.get_actions_for_cell(cell, state) for cell in cells]
 
-        for length in xrange(len(cells)):
+        for length in xrange(1, len(cells) + 1):
             for move in itertools.combinations(possibilities, length):
-                result.append(move)
+                result.append(list(move))
 
-        return result
+        return result[0][0]  # TODO understand this
 
     def get_result(self, action, state):
         """

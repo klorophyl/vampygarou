@@ -15,14 +15,15 @@ class Vampygarou:
         self.manual = manual
         self.map = None
         self.race = None
-        self.strategy = Strategy("feed")
-        return
+        self.strategy = None
 
     def retrieve_race(self):
         if self.map.home.get_pos() == self.map.vampires[0].get_pos():
             self.race = Race.VAMPIRES
         else:
             self.race = Race.WEREWOLVES
+
+        self.strategy = Strategy(race=self.race)
 
     def get_moves(self):
         """
