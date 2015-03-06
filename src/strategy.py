@@ -114,8 +114,10 @@ class Strategy(object):
         Returns state resulting of applying given action on given state
         """
         new_state = copy(state)
-        new_state.update_with_changes([[m.from_x, m.from_y, m.amount, m.to_x, m.to_y] for m in action])
+        for move in action:
+            new_state.apply_move(move)
 
+        print new_state
         return new_state
 
     def minimax(self, state, race):
@@ -124,10 +126,15 @@ class Strategy(object):
         """
         actions = self.get_actions(state)
         value = -float("inf")
+        action_to_play = None
         for action in actions:
-            if self.min_value(self.get_result(action, state), Strategy.MAX_DEPTH) > value:
-                value = self.min_value(self.get_result(action, state), Strategy.MAX_DEPTH)
+            action_value = self.min_value(self.get_result(action, state), Strategy.MAX_DEPTH)
+            if action_value > value:
+                value = action_value
                 action_to_play = action
+
+        if action_to_play is None:
+            raise ValueError("Something went wrong, action_value stayed at -inf")
 
         return action_to_play
 
@@ -138,11 +145,10 @@ class Strategy(object):
         if depth == 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
-            depth -= 1
             value = -float("inf")
-            succ = self.get_successors(state)
-            for action_state in succ:
-                value = max(value, self.min_value(action_state, depth))
+            successors = self.get_successors(state)
+            for action_state in successors:
+                value = max(value, self.min_value(action_state, depth - 1))
         return value
 
     def min_value(self, state, depth):
@@ -152,44 +158,42 @@ class Strategy(object):
         if depth == 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
-            depth -= 1
             value = float("inf")
-            succ = self.get_successors(state)
-            for action_state in succ:
-                value = min(value, self.max_value(action_state, depth))
+            successors = self.get_successors(state)
+            for action_state in successors:
+                value = min(value, self.max_value(action_state, depth - 1))
         return value
 
-    def get_alpha(self, state, depth, alpha, beta):
-        """
-        Returns the alpha of a given state with given depth, alpha beta
-        """
-        if depth == 0 or self.is_terminal(state):
-            return self.get_utility(state)
-        else:
-            depth -= 1
-            value = -float("inf")
-            succ = self.get_successors(state)
-            count = 0
-            while count < succ.length and alpha < beta:
-                value = max(value, self.min_value(succ(count), depth, alpha, beta))
+    # def get_alpha(self, state, depth, alpha, beta):
+    #     """
+    #     Returns the alpha of a given state with given depth, alpha beta
+    #     """
+    #     if depth == 0 or self.is_terminal(state):
+    #         return self.get_utility(state)
+    #     else:
+    #         depth -= 1
+    #         value = -float("inf")
+    #         successors = self.get_successors(state)
+    #         count = 0
+    #         while count < successors.length and alpha < beta:
+    #             value = max(value, self.min_value(succ(count), depth, alpha, beta))
+    #             alpha = max(value, alpha)
+    #             count += 1
+    #     return alpha
 
-                alpha = max(value, alpha)
-                count += 1
-        return alpha
-
-    def get_beta(self, state, depth, alpha, beta):
-        """
-        Returns the alpha of a given state with given depth, alpha beta
-        """
-        if depth == 0 or self.is_terminal(state):
-            return self.get_utility(state)
-        else:
-            depth -= 1
-            value = float("inf")
-            succ = self.get_successors(state)
-            count = 0
-            while count < succ.length and alpha < beta:
-                value = min(value, self.max_value(succ(count), depth, alpha, beta))
-                beta = min(value, beta)
-                count += 1
-        return beta
+    # def get_beta(self, state, depth, alpha, beta):
+    #     """
+    #     Returns the alpha of a given state with given depth, alpha beta
+    #     """
+    #     if depth == 0 or self.is_terminal(state):
+    #         return self.get_utility(state)
+    #     else:
+    #         depth -= 1
+    #         value = float("inf")
+    #         successors = self.get_successors(state)
+    #         count = 0
+    #         while count < successors.length and alpha < beta:
+    #             value = min(value, self.max_value(succ(count), depth, alpha, beta))
+    #             beta = min(value, beta)
+    #             count += 1
+    #     return beta

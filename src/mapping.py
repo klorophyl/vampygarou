@@ -30,6 +30,8 @@ class Cell(object):
 class PopulatedCell(Cell):
     def __init__(self, x, y, population=0):
         super(PopulatedCell, self).__init__(x, y)
+        if population < 0:
+            raise ValueError("Population must be positive")
         self.population = population
 
 
@@ -89,9 +91,6 @@ class Map:
         self._check_bounds(x, y, "House")
         self.houses.append(House(x, y))
 
-    def set_cell(self, x, y, cell_type):
-        self.grid[y][x] = cell_type
-
     def get_cell(self, x, y):
         """
         Returns the cell if populated
@@ -121,8 +120,10 @@ class Map:
             return Race.HUMANS
         elif self.get_cell_in(x, y, self.vampires):
             return Race.VAMPIRES
-        if self.get_cell_in(x, y, self.werewolves):
+        elif self.get_cell_in(x, y, self.werewolves):
             return Race.WEREWOLVES
+        else:
+            return None
 
     def init_counts(self, cells_info):
         """
@@ -162,6 +163,33 @@ class Map:
             )
             if to_change is not None:
                 to_change.append(cell_type(change[0], change[1], amount))
+
+    def get_cell_at(self, x, y):
+        cell = self.get_cell_in(x, y, self.vampires + self.werewolves + self.houses)
+        return cell
+
+    def apply_move(self, move):
+        """
+        Update the map with the given move
+        """
+        from_cell_race = self.get_race(move.from_x, move.from_y)
+        from_cell = self.get_cell_at(move.from_x, move.from_y)
+        to_cell = self.get_cell_at(move.to_x, move.to_y)
+        if to_cell is None:
+            to_cell_population = 0
+        else:
+            to_cell_population = to_cell.population
+
+        if from_cell.population - move.amount < 0:
+            raise ValueError("Negative population")
+        from_cell.population -= move.amount
+
+        if from_cell_race == Race.VAMPIRES:
+            to_cell = Vampires(move.to_x, move.to_y, to_cell_population + move.amount)
+        elif from_cell_race == Race.WEREWOLVES:
+            to_cell = Werewolves(move.to_x, move.to_y, to_cell_population + move.amount)
+        else:
+            raise ValueError("Trying to move something else than vampires or werewolves")
 
     def get_state_after_move(self, move):
         return 0
