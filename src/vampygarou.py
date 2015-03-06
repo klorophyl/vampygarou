@@ -1,10 +1,8 @@
 # coding: utf-8
 import random
-import itertools
-from datetime import datetime
 
 from strategy import Strategy
-from mapping import Cell, Move, Race
+from mapping import Race
 
 
 class Vampygarou:

@@ -1,6 +1,7 @@
 #  wow Gab, much English, very comment
-
-from mapping import Move
+from copy import copy
+import itertools
+from mapping import Move, Race
 
 
 class Strategy(object):
@@ -80,7 +81,11 @@ class Strategy(object):
         """
         Returns state resulting of applying given action on given state
         """
-        pass
+        new_state = copy(state)
+        for move in action:
+            new_state.apply_move(move)
+
+        return new_state
 
     def max_value(self, state, depth):
         """
