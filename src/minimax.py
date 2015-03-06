@@ -9,9 +9,15 @@ class Strategy(object):
         return
 
     def get_next_move(self):
+        """
+        Returns the chosen move
+        """
         return None
 
     def get_utility(self, state, race):
+        """
+        Returns the heuristic
+        """
         utility = state.get_vampire_population - state.get_werewolve_population
         if race == "vampires":
             return utility
@@ -19,18 +25,33 @@ class Strategy(object):
             return -utility
 
     def is_terminal(self, state):
+        """
+        Returns bool if the state is terminal
+        """
         pass
 
     def get_successors(self, state):
+        """
+        Returns possible successors to a given state
+        """
         pass
 
     def get_actions(self, state):
+        """
+        Returns a list of possible actions on a given state
+        """
         pass
 
     def get_result(self, action, state):
+        """
+        Returns state resulting of applying given action on given state
+        """
         pass
 
     def max_value(self, state, depth):
+        """
+        Returns max value according to minimax
+        """
         if depth == 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
@@ -42,6 +63,9 @@ class Strategy(object):
         return value
 
     def min_value(self, state, depth):
+        """
+        Returns min value according to minimax
+        """
         if depth == 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
@@ -53,6 +77,9 @@ class Strategy(object):
         return value
 
     def minimax(self, state, race):
+        """
+        Return best action according to minimax on a given state and race
+        """
         actions = self.get_actions(state)
         value = float("inf")*-1
         for act in actions:
@@ -62,6 +89,9 @@ class Strategy(object):
         return act_to_play
 
     def get_alpha(self, state, depth, alpha, beta):
+        """
+        Returns the alpha of a given state with given depth, alpha beta
+        """
         if depth == 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
@@ -77,6 +107,9 @@ class Strategy(object):
         return alpha
 
     def get_beta(self, state, depth, alpha, beta):
+        """
+        Returns the beta of a given state with given depth, alpha beta
+        """
         if depth == 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
