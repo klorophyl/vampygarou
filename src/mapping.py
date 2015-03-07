@@ -164,17 +164,27 @@ class Map:
             if to_change is not None:
                 to_change.append(cell_type(change[0], change[1], amount))
 
-    def get_cell_at(self, x, y):
+    def pop_cell_at(self, x, y):
         cell = self.get_cell_in(x, y, self.vampires + self.werewolves + self.houses)
+        race = self.get_race(x, y)
+
+        if race == Race.VAMPIRES:
+            self.vampires.remove(cell)
+        elif race == Race.WEREWOLVES:
+            self.werewolves.remove(cell)
+        elif race == Race.HUMANS:
+            self.houses.remove(cell)
+
         return cell
 
     def apply_move(self, move):
         """
         Update the map with the given move
+        TODO add battles
         """
         from_cell_race = self.get_race(move.from_x, move.from_y)
-        from_cell = self.get_cell_at(move.from_x, move.from_y)
-        to_cell = self.get_cell_at(move.to_x, move.to_y)
+        from_cell = self.pop_cell_at(move.from_x, move.from_y)
+        to_cell = self.pop_cell_at(move.to_x, move.to_y)
         if to_cell is None:
             to_cell_population = 0
         else:
@@ -186,8 +196,14 @@ class Map:
 
         if from_cell_race == Race.VAMPIRES:
             to_cell = Vampires(move.to_x, move.to_y, to_cell_population + move.amount)
+            self.vampires.append(to_cell)
+            if from_cell.population > 0:
+                self.vampires.append(from_cell)
         elif from_cell_race == Race.WEREWOLVES:
             to_cell = Werewolves(move.to_x, move.to_y, to_cell_population + move.amount)
+            self.werewolves.append(to_cell)
+            if from_cell.population > 0:
+                self.werewolves.append(from_cell)
         else:
             raise ValueError("Trying to move something else than vampires or werewolves")
 

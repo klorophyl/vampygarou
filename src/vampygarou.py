@@ -1,6 +1,4 @@
 # coding: utf-8
-import random
-
 from strategy import Strategy
 from mapping import Race
 
@@ -10,9 +8,10 @@ class Vampygarou:
     IA implementation
     """
 
-    def __init__(self, name, manual):
+    def __init__(self, name, is_manual, is_random):
         self.name = name
-        self.manual = manual
+        self.manual = is_manual
+        self.random = is_random
         self.map = None
         self.race = None
         self.strategy = None
@@ -34,6 +33,8 @@ class Vampygarou:
         """
         if self.manual:
             return self.get_manual_moves()
+        elif self.random:
+            return self.strategy.get_random_move(self.map)
 
         return self.strategy.get_next_move(self.map)
 
@@ -54,13 +55,3 @@ class Vampygarou:
                 return self.get_moves()
 
         return moves
-
-    def get_random_moves(self):
-        """
-        Choose a random moves in all legal moves
-        """
-        legal_moves = []
-        for cell in self.get_cells():
-            legal_moves += self.get_legal_moves_for(cell)
-
-        return list(random.choice(legal_moves))

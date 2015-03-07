@@ -35,6 +35,12 @@ def parse_args():
         dest="manual",
         action="store_true"
     )
+    parser.add_argument(
+        "-random",
+        help="play randomly",
+        dest="random",
+        action="store_true"
+    )
     parser.set_defaults(manual=False)
 
     return parser.parse_args()
@@ -131,7 +137,7 @@ if __name__ == "__main__":
     name = args.name or "Vampygarou"
     print "\n\t\tBonjour {}, je suis Vampygarou.\n\n".format(name)
 
-    vampygarou = Vampygarou(name, args.manual)
+    vampygarou = Vampygarou(name, args.manual, args.random)
 
     server_address = args.ip or "127.0.0.1"
     server_port = args.port or 5555

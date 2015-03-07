@@ -1,12 +1,13 @@
 #  wow Gab, much English, very comment
-from copy import copy
 import itertools
 import random
+import time
+from copy import deepcopy
 from mapping import Move, Race
 
 
 class Strategy(object):
-    MAX_DEPTH = 4
+    MAX_DEPTH = 2
 
     def __init__(self, race):
         self.race = race
@@ -15,7 +16,12 @@ class Strategy(object):
         """
         Returns the chosen move
         """
+        state = deepcopy(state)
         return self.minimax(state, self.race)
+
+    def get_random_move(self, state):
+        time.sleep(0.3)
+        return random.choice(self.get_actions(state))
 
     def get_utility(self, state):
         """
@@ -32,7 +38,7 @@ class Strategy(object):
 
     def get_actions_for_cell(self, cell, state):
         """
-        Returns a list of possible actions on a given cell (list of Turn)
+        Returns a list of possible actions on a given cell (list of list of Move)
         """
         legal_unit_moves = []
         legal_turns = []
@@ -42,7 +48,7 @@ class Strategy(object):
             neighbor_pop = state.get_pop(neighbor.x, neighbor.y)
 
             # /!\ only move everyone for now
-            for count in xrange(1, cell.population + 1):
+            for count in xrange(cell.population, cell.population + 1):
                 if self.check_rules_on_unit_move(neighbor_race, neighbor_pop, count):
                     legal_unit_moves.append(Move(cell.x, cell.y, count, neighbor.x, neighbor.y))
 
@@ -52,6 +58,8 @@ class Strategy(object):
             for moves in itertools.combinations(legal_unit_moves, length):
                 if self.is_turn_legal(moves, state):
                     legal_turns.append(list(moves))
+
+        legal_turns.append([])  # add an empty move
 
         return legal_turns
 
@@ -97,27 +105,29 @@ class Strategy(object):
 
     def get_actions(self, state):
         """
-        Returns a list of possible actions on a given state
+        Returns a list of possible actions on a given state (list of list of list of Move)
         """
         result = []
         cells = state.vampires if self.race == Race.VAMPIRES else state.werewolves
+
+        # all the possible actions, sorted by origin cell
         possibilities = [self.get_actions_for_cell(cell, state) for cell in cells]
+        product = itertools.product(*possibilities)
 
-        for length in xrange(1, len(cells) + 1):
-            for move in itertools.combinations(possibilities, length):
-                result.append(list(move))
+        for action in product:
+            if len(action) > 0:
+                result.append([item for sublist in action for item in sublist])
 
-        return random.choice(random.choice(result))
+        return result
 
     def get_result(self, action, state):
         """
         Returns state resulting of applying given action on given state
         """
-        new_state = copy(state)
+        new_state = deepcopy(state)
         for move in action:
             new_state.apply_move(move)
 
-        print new_state
         return new_state
 
     def minimax(self, state, race):
@@ -149,6 +159,7 @@ class Strategy(object):
             successors = self.get_successors(state)
             for action_state in successors:
                 value = max(value, self.min_value(action_state, depth - 1))
+
         return value
 
     def min_value(self, state, depth):
@@ -162,6 +173,7 @@ class Strategy(object):
             successors = self.get_successors(state)
             for action_state in successors:
                 value = min(value, self.max_value(action_state, depth - 1))
+
         return value
 
     # def get_alpha(self, state, depth, alpha, beta):
