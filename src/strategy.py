@@ -20,7 +20,7 @@ class Strategy(object):
         return self.minimax(state, self.race)
 
     def get_random_move(self, state):
-        time.sleep(0.3)
+        time.sleep(0.5)
         return random.choice(self.get_actions(state))
 
     def get_utility(self, state):
@@ -47,8 +47,8 @@ class Strategy(object):
             neighbor_race = state.get_race(neighbor.x, neighbor.y)
             neighbor_pop = state.get_pop(neighbor.x, neighbor.y)
 
-            # /!\ only move everyone for now
-            for count in xrange(cell.population, cell.population + 1):
+            # /!\ only move everyone or 1 for now
+            for count in [cell.population]:
                 if self.check_rules_on_unit_move(neighbor_race, neighbor_pop, count):
                     legal_unit_moves.append(Move(cell.x, cell.y, count, neighbor.x, neighbor.y))
 
@@ -135,10 +135,14 @@ class Strategy(object):
         Return best action according to minimax on a given state and race
         """
         actions = self.get_actions(state)
+        alpha = -float("inf")
+        beta = float("inf")
         value = -float("inf")
         action_to_play = None
         for action in actions:
-            action_value = self.min_value(self.get_result(action, state), Strategy.MAX_DEPTH)
+            action_value = self.min_value(
+                self.get_result(action, state), Strategy.MAX_DEPTH, alpha, beta
+            )
             if action_value > value:
                 value = action_value
                 action_to_play = action
@@ -148,64 +152,32 @@ class Strategy(object):
 
         return action_to_play
 
-    def max_value(self, state, depth):
+    def max_value(self, state, depth, alpha, beta):
         """
         Returns max value according to minimax
         """
-        if depth == 0 or self.is_terminal(state):
+        if depth <= 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
-            value = -float("inf")
             successors = self.get_successors(state)
             for action_state in successors:
-                value = max(value, self.min_value(action_state, depth - 1))
+                alpha = max(alpha, self.min_value(action_state, depth - 1, alpha, beta))
+                if alpha >= beta:
+                    return beta
 
-        return value
+        return alpha
 
-    def min_value(self, state, depth):
+    def min_value(self, state, depth, alpha, beta):
         """
         Returns min value according to minimax
         """
-        if depth == 0 or self.is_terminal(state):
+        if depth <= 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
-            value = float("inf")
             successors = self.get_successors(state)
             for action_state in successors:
-                value = min(value, self.max_value(action_state, depth - 1))
+                beta = min(beta, self.max_value(action_state, depth - 1, alpha, beta))
+                if alpha >= beta:
+                    return alpha
 
-        return value
-
-    # def get_alpha(self, state, depth, alpha, beta):
-    #     """
-    #     Returns the alpha of a given state with given depth, alpha beta
-    #     """
-    #     if depth == 0 or self.is_terminal(state):
-    #         return self.get_utility(state)
-    #     else:
-    #         depth -= 1
-    #         value = -float("inf")
-    #         successors = self.get_successors(state)
-    #         count = 0
-    #         while count < successors.length and alpha < beta:
-    #             value = max(value, self.min_value(succ(count), depth, alpha, beta))
-    #             alpha = max(value, alpha)
-    #             count += 1
-    #     return alpha
-
-    # def get_beta(self, state, depth, alpha, beta):
-    #     """
-    #     Returns the alpha of a given state with given depth, alpha beta
-    #     """
-    #     if depth == 0 or self.is_terminal(state):
-    #         return self.get_utility(state)
-    #     else:
-    #         depth -= 1
-    #         value = float("inf")
-    #         successors = self.get_successors(state)
-    #         count = 0
-    #         while count < successors.length and alpha < beta:
-    #             value = min(value, self.max_value(succ(count), depth, alpha, beta))
-    #             beta = min(value, beta)
-    #             count += 1
-    #     return beta
+        return beta
