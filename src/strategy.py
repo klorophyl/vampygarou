@@ -2,6 +2,7 @@
 import itertools
 import random
 import time
+from math import hypot
 from copy import deepcopy
 from mapping import Move, Race
 
@@ -27,8 +28,18 @@ class Strategy(object):
         """
         Returns the heuristic
         """
-        utility = state.get_vampire_population() - state.get_werewolve_population()
-        return (1 if self.race == Race.VAMPIRES else -1) * utility
+        utility = 10 * (state.get_vampire_population() - state.get_werewolve_population())
+        dist = 0
+        for v in state.vampires:
+            for w in state.werewolves:
+                dist += hypot(v.x - w.x, v.y - w.y)
+
+        if self.race == Race.WEREWOLVES:
+            utility *= -1
+
+        utility -= dist
+
+        return utility
 
     def is_terminal(self, state):
         """
@@ -48,7 +59,7 @@ class Strategy(object):
             neighbor_pop = state.get_pop(neighbor.x, neighbor.y)
 
             # /!\ only move everyone or 1 for now
-            for count in [cell.population]:
+            for count in range(1, cell.population + 1):
                 if self.check_rules_on_unit_move(neighbor_race, neighbor_pop, count):
                     legal_unit_moves.append(Move(cell.x, cell.y, count, neighbor.x, neighbor.y))
 
@@ -80,6 +91,10 @@ class Strategy(object):
                 cell_pop[move.from_x][move.from_y] = 0
 
             cell_pop[move.from_x][move.from_y] += move.amount
+
+        if set([(m.from_x, m.from_y) for m in moves]) & set([(m.to_x, m.to_y) for m in moves]):
+            # some destinations are also departures
+            return False
 
         for x, temp in cell_pop.iteritems():
             for y, count in temp.iteritems():
@@ -139,7 +154,7 @@ class Strategy(object):
         beta = float("inf")
         value = -float("inf")
         action_to_play = None
-        for action in actions:
+        for action in random.sample(actions, 3):
             action_value = self.min_value(
                 self.get_result(action, state), Strategy.MAX_DEPTH, alpha, beta
             )
@@ -160,7 +175,7 @@ class Strategy(object):
             return self.get_utility(state)
         else:
             successors = self.get_successors(state)
-            for action_state in successors:
+            for action_state in random.sample(successors, 3):
                 alpha = max(alpha, self.min_value(action_state, depth - 1, alpha, beta))
                 if alpha >= beta:
                     return beta
@@ -175,7 +190,7 @@ class Strategy(object):
             return self.get_utility(state)
         else:
             successors = self.get_successors(state)
-            for action_state in successors:
+            for action_state in random.sample(successors, 3):
                 beta = min(beta, self.max_value(action_state, depth - 1, alpha, beta))
                 if alpha >= beta:
                     return alpha
