@@ -73,8 +73,6 @@ class Strategy(object):
                 if self.is_turn_legal(moves, state):
                     legal_turns.append(list(moves))
 
-        legal_turns.append([])  # add an empty move
-
         return legal_turns
 
     def is_turn_legal(self, moves, state):
@@ -117,10 +115,11 @@ class Strategy(object):
         # TBM with bataille aleatoire
         if cell_race != self.race and cell_pop > move_pop:
             return False
-        if ((move_pop < total_pop_on_cell / 4 or move_pop > total_pop_on_cell * 3 / 4)
-                and move_pop != total_pop_on_cell):
+
+        if move_pop != total_pop_on_cell and (move_pop < 3 or (total_pop_on_cell - move_pop < 3)):
             # do not leave behind too few people
             return False
+
         return True
 
     def get_successors(self, state):
@@ -185,9 +184,9 @@ class Strategy(object):
         if depth <= 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
-            successors = self.get_successors(state)
-            for action_state in successors:
+            for action_state in self.get_successors(state):
                 alpha = max(alpha, self.min_value(action_state, depth - 1, alpha, beta))
+                print "max_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
                 if alpha >= beta:
                     return beta
 
@@ -200,9 +199,9 @@ class Strategy(object):
         if depth <= 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
-            successors = self.get_successors(state)
-            for action_state in successors:
+            for action_state in self.get_successors(state):
                 beta = min(beta, self.max_value(action_state, depth - 1, alpha, beta))
+                print "min_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
                 if alpha >= beta:
                     return alpha
 
