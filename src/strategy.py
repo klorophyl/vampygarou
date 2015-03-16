@@ -24,24 +24,37 @@ class Strategy(object):
         """
         Choose a move randomly
         """
-        time.sleep(2)  # TO BE REMOVED
         return random.choice(self.get_actions(state))
 
     def get_utility(self, state):
         """
         Returns the heuristic
         """
-        utility = 10 * (state.get_population(Race.VAMPIRES)
-                        - state.get_population(Race.WEREWOLVES))
-        dist = 0
-        # for vampire in state.vampires:
-        #     for werewolve in state.werewolves:
-        #         dist += hypot(vampire.x - werewolve.x, vampire.y - werewolve.y)
+        utility = 0
+        coeff_enemy = 1000
+        coeff_human = 100
 
-        if self.race == Race.WEREWOLVES:
-            utility *= -1
+        enemy_cells = state.get_cells(Race.WEREWOLVES if self.race == Race.VAMPIRES else Race.VAMPIRES)
+        friend_cells = state.get_cells(self.race)
+        human_cells = state.get_cells(Race.HUMANS)
 
-        utility -= dist
+        for enemy_cell in enemy_cells:
+            for friend_cell in friend_cells:
+                dist = hypot(friend_cell[1] - enemy_cell[1], friend_cell[2] - enemy_cell[2])
+                enemy_pop = enemy_cell[0].population
+                friend_pop = friend_cell[0].population
+                diff_pop = friend_pop - enemy_pop
+                utility += coeff_enemy / dist * (diff_pop if friend_pop > 1.5 * enemy_pop else 0)
+
+        for human_cell in human_cells:
+            for friend_cell in friend_cells:
+                dist = hypot(friend_cell[1] - human_cell[1], friend_cell[2] - human_cell[2])
+                human_pop = human_cell[0].population
+                friend_pop = friend_cell[0].population
+                diff_pop = friend_pop - human_pop
+                utility += coeff_human / dist * (diff_pop if diff_pop > 0 else 0)
+
+        utility += 1000000 * state.get_population(self.race)
 
         return utility
 
@@ -185,7 +198,7 @@ class Strategy(object):
         """
         Returns max value according to minimax
         """
-        print "max_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
+        # print "max_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
         if depth <= 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
@@ -201,7 +214,7 @@ class Strategy(object):
         """
         Returns min value according to minimax
         """
-        print "min_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
+        # print "min_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
         if depth <= 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
