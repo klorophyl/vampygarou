@@ -116,7 +116,7 @@ class Strategy(object):
         # TBM with bataille aleatoire
         if cell_race != self.race and cell_pop > move_pop:
             return False
-        if (move_pop < total_pop_on_cell / 4 or move_pop > total_pop_on_cell * 3 / 4) and move_pop != total_pop_on_cell:
+        if move_pop != total_pop_on_cell and (move_pop < 3 or (total_pop_on_cell - move_pop < 3)):
             # do not leave behind too few people
             return False
         return True
@@ -163,7 +163,7 @@ class Strategy(object):
         beta = float("inf")
         value = -float("inf")
         action_to_play = None
-        for action in actions:
+        for action in random.sample(actions, min(3, len(actions))):
             action_value = self.min_value(
                 self.get_result(action, state), Strategy.MAX_DEPTH, alpha, beta
             )
@@ -184,7 +184,7 @@ class Strategy(object):
             return self.get_utility(state)
         else:
             successors = self.get_successors(state)
-            for action_state in successors:
+            for action_state in random.sample(successors, min(3, len(successors))):
                 alpha = max(alpha, self.min_value(action_state, depth - 1, alpha, beta))
                 if alpha >= beta:
                     return beta
@@ -199,7 +199,7 @@ class Strategy(object):
             return self.get_utility(state)
         else:
             successors = self.get_successors(state)
-            for action_state in successors:
+            for action_state in random.sample(successors, min(3, len(successors))):
                 beta = min(beta, self.max_value(action_state, depth - 1, alpha, beta))
                 if alpha >= beta:
                     return alpha
