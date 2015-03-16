@@ -49,22 +49,19 @@ class Strategy(object):
         """
         return state.get_werewolve_population() == 0 or state.get_vampire_population() == 0
 
-    def get_actions_for_cell(self, cell, state):
+    def get_actions_for_cell(self, cell, x, y, state):
         """
         Returns a list of possible actions on a given cell (list of list of Move)
         """
         legal_unit_moves = []
         legal_turns = []
 
-        for neighbor in state.get_neighbor_cells_of(cell):
-            neighbor_race = state.get_race(neighbor.x, neighbor.y)
-            neighbor_pop = state.get_pop(neighbor.x, neighbor.y)
-
+        for neighbor, neighbor_x, neighbor_y in state.get_neighbor_cells_of(x, y):
             # /!\ only move everyone or 1 for now
             for count in range(cell.population, cell.population + 1):
-                if self.check_rules_on_unit_move(neighbor_race, neighbor_pop,
+                if self.check_rules_on_unit_move(neighbor.race, neighbor.population,
                                                  count, cell.population):
-                    legal_unit_moves.append(Move(cell.x, cell.y, count, neighbor.x, neighbor.y))
+                    legal_unit_moves.append(Move(x, y, count, neighbor_x, neighbor_y))
 
         for length in xrange(1, cell.population + 1):
             # you can't make more moves than your total population
@@ -133,10 +130,10 @@ class Strategy(object):
         Returns a list of possible actions on a given state (list of list of list of Move)
         """
         result = []
-        cells = state.vampires if self.race == Race.VAMPIRES else state.werewolves
+        cells = state.get_player_cells_and_coordinates()
 
         # all the possible actions, sorted by origin cell
-        possibilities = [self.get_actions_for_cell(cell, state) for cell in cells]
+        possibilities = [self.get_actions_for_cell(cell, x, y, state) for cell, x, y in cells]
         product = itertools.product(*possibilities)
 
         for action in product:

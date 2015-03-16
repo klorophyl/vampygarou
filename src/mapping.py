@@ -73,7 +73,7 @@ class Map:
 
     def get_player_race(self):
         x, y = self.home
-        return self.grid[x][y]
+        return self.grid[x][y].race
 
     def get_race(self, x, y):
         """
@@ -145,7 +145,7 @@ class Map:
         """
         return sum([cell.population for row in self.grid for cell in row if cell.race == race])
 
-    def get_neighbor_cells_of(self, cell):
+    def get_neighbor_cells_of(self, cell_x, cell_y):
         """
         Returns a list of possible cells
         """
@@ -153,11 +153,23 @@ class Map:
 
         for x in range(-1, 2):
             for y in range(-1, 2):
-                if 0 < cell.x + x < self.size_x and 0 < cell.y + y < self.size_y \
+                if 0 < cell_x + x < self.size_x and 0 < cell_y + y < self.size_y \
                         and not (x == 0 and y == 0):
-                    legal_cells.append(self.grid[x][y])
+                    legal_cells.append((self.grid[x][y], x, y))
 
         return legal_cells
+
+    def get_player_cells_and_coordinates(self):
+        race = self.get_player_race()
+        cells = []
+
+        for y in range(self.size_y):
+            for x in range(self.size_x):
+                cell = self.grid[x][y]
+                if cell.race == race:
+                    cells.append((cell, x, y))
+
+        return cells
 
     def _check_bounds(self, x, y, cell_type):
         """
