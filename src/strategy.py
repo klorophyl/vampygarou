@@ -34,9 +34,9 @@ class Strategy(object):
         utility = 10 * (state.get_population(Race.VAMPIRES)
                         - state.get_population(Race.WEREWOLVES))
         dist = 0
-        for vampire in state.vampires:
-            for werewolve in state.werewolves:
-                dist += hypot(vampire.x - werewolve.x, vampire.y - werewolve.y)
+        # for vampire in state.vampires:
+        #     for werewolve in state.werewolves:
+        #         dist += hypot(vampire.x - werewolve.x, vampire.y - werewolve.y)
 
         if self.race == Race.WEREWOLVES:
             utility *= -1

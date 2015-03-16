@@ -70,15 +70,7 @@ def get_home(vampygarou):
 
 
 def update_moves(vampygarou):
-    print "Entering update"
-    n = server.get_messages_int(1)
-    changes = []
-    for i in range(n):
-        changes.append(server.get_messages_int(5))
-        print "- Changes: {}".format(changes[-1])
-
-    vampygarou.map.update_with_changes(changes)
-    print vampygarou.map
+    update_map(vampygarou)
     server.send_moves(vampygarou.get_moves())
 
 
@@ -88,12 +80,7 @@ def update_map(vampygarou):
     changes = []
     for i in range(n):
         changes.append(server.get_messages_int(5))
-        # print "- Changes: {}".format(changes[-1])
-
-    vampygarou.map.init_counts(changes)
-
-    if not vampygarou.race:
-        vampygarou.retrieve_race()
+    vampygarou.map.update_with_changes(changes)
 
 
 def end_game(vampygarou):
@@ -111,8 +98,11 @@ def run_game(vampygarou):
         get_home(vampygarou)
     elif order == "UPD":
         update_moves(vampygarou)
+        print vampygarou.map
     elif order == "MAP":
         update_map(vampygarou)
+        if vampygarou.race is None:
+            vampygarou.retrieve_race()
         print vampygarou.map
     elif order == "END":
         end_game(vampygarou)
