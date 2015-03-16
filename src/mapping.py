@@ -1,57 +1,34 @@
 # coding: utf-8
 from message import Colors
+from copy import deepcopy
 
 
 class Race(object):
+    NONE = "none"
     VAMPIRES = "vampires"
     WEREWOLVES = "werewolves"
     HUMANS = "humans"
 
 
 class Cell(object):
-    """
-    A cell
-    """
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def move_to(self, x, y):
-        self.x = x
-        self.y = y
-
-    def get_pos(self):
-        return (self.x, self.y)
-
-    def __repr__(self):
-        return "<Cell {}, {}>".format(self.x, self.y)
-
-
-class PopulatedCell(Cell):
-    def __init__(self, x, y, population=0):
-        super(PopulatedCell, self).__init__(x, y)
+    def __init__(self, race, population=0):
         if population < 0:
             raise ValueError("Population must be positive")
         self.population = population
+        self.race = race
 
+    def __repr__(self):
+        return "<{} {}>".format(self.race, self.population)
 
-class House(PopulatedCell):
     def __str__(self):
-        return "H" + str(self.population)
-
-
-class Home(Cell):
-    pass
-
-
-class Vampires(PopulatedCell):
-    def __str__(self):
-        return Colors.RED + "V" + str(self.population) + Colors.END
-
-
-class Werewolves(PopulatedCell):
-    def __str__(self):
-        return Colors.BLUE + "W" + str(self.population) + Colors.END
+        if self.race == Race.NONE:
+            return "  "
+        elif self.race == Race.VAMPIRES:
+            return "V{}".format(self.population)
+        elif self.race == Race.WEREWOLVES:
+            return "W{}".format(self.population)
+        elif self.race == Race.HUMANS:
+            return "H{}".format(self.population)
 
 
 class Move(object):
@@ -78,52 +55,31 @@ class Map:
     def __init__(self, size_x, size_y):
         self.size_x = size_x
         self.size_y = size_y
-        self.home = []
-        self.houses = []
-        self.vampires = []
-        self.werewolves = []
+        self.grid = [[Cell(Race.NONE) for y in range(self.size_y)] for x in range(self.size_x)]
+        self.home = None
 
-    def set_home(self, x, y):
-        self._check_bounds(x, y, "Home")
-        self.home = Home(x, y)
-
-    def add_house(self, x, y):
-        self._check_bounds(x, y, "House")
-        self.houses.append(House(x, y))
-
-    def get_cell(self, x, y):
-        """
-        Returns the cell if populated
-        """
-        return self.get_cell_in(x, y, self.houses + self.vampires + self.werewolves)
-
-    def get_cell_in(self, x, y, array):
-        """
-        Returns the cell if in a given array
-        """
-        for cell in array:
-            if cell.get_pos() == (x, y):
-                return cell
+    def add_human(self, x, y):
+        self._check_bounds(x, y, "Human")
+        self.grid[x][y] = Cell(Race.HUMANS, 0)
 
     def get_pop(self, x, y):
         """
         Returns the population for a given cell
         """
-        cell = self.get_cell(x, y)
-        return cell.population if cell else 0
+        return self.grid[x][y].population
+
+    def set_home(self, x, y):
+        self.home = (x, y)
+
+    def get_player_race(self):
+        x, y = self.home
+        return self.grid[x][y]
 
     def get_race(self, x, y):
         """
-        Returns the population type for a given cell
+        Returns the race for a given cell
         """
-        if self.get_cell_in(x, y, self.houses):
-            return Race.HUMANS
-        elif self.get_cell_in(x, y, self.vampires):
-            return Race.VAMPIRES
-        elif self.get_cell_in(x, y, self.werewolves):
-            return Race.WEREWOLVES
-        else:
-            return None
+        return self.grid[x][y].race
 
     def init_counts(self, cells_info):
         """
@@ -131,49 +87,34 @@ class Map:
         """
         self.vampires = []
         self.werewolves = []
-        self.houses = []
+        self.humans = []
 
         for cell in cells_info:
             x, y, humans, vampires, werewolves = cell
             if humans > 0:
-                self.houses.append(House(x, y, humans))
+                self.grid[x][y] = Cell(Race.HUMANS, humans)
             if vampires > 0:
-                self.vampires.append(Vampires(x, y, vampires))
+                self.grid[x][y] = Cell(Race.VAMPIRES, vampires)
             if werewolves > 0:
-                self.werewolves.append(Werewolves(x, y, werewolves))
+                self.grid[x][y] = Cell(Race.WEREWOLVES, werewolves)
 
     def update_with_changes(self, changes):
         """
         Update the number of humans, vampires, and werewolves on the map from changes sent by
         server.
         """
-        for change in changes:
-            # clean previous list from change
-            self.houses = [h for h in self.houses if h.get_pos() != (change[0], change[1])]
-            self.vampires = [v for v in self.vampires if v.get_pos() != (change[0], change[1])]
-            self.werewolves = [w for w in self.werewolves if w.get_pos() != (change[0], change[1])]
-
-            # apply change
-            amount = change[2] or change[3] or change[4]
-            to_change, cell_type = (
-                (self.houses, House) if change[2] else
-                (self.vampires, Vampires) if change[3] else
-                (self.werewolves, Werewolves) if change[4] else
-                (None, None)
-            )
-            if to_change is not None:
-                to_change.append(cell_type(change[0], change[1], amount))
+        for cell in changes:
+            x, y, humans, vampires, werewolves = cell
+            if humans > 0:
+                self.grid[x][y] = Cell(Race.HUMANS, humans)
+            if vampires > 0:
+                self.grid[x][y] = Cell(Race.VAMPIRES, vampires)
+            if werewolves > 0:
+                self.grid[x][y] = Cell(Race.WEREWOLVES, werewolves)
 
     def pop_cell_at(self, x, y):
-        cell = self.get_cell_in(x, y, self.vampires + self.werewolves + self.houses)
-        race = self.get_race(x, y)
-
-        if race == Race.VAMPIRES:
-            self.vampires.remove(cell)
-        elif race == Race.WEREWOLVES:
-            self.werewolves.remove(cell)
-        elif race == Race.HUMANS:
-            self.houses.remove(cell)
+        cell = deepcopy(self.grid[x][y])
+        self.grid[x][y] = Cell(Race.EMPTY)
 
         return cell
 
@@ -182,45 +123,27 @@ class Map:
         Update the map with the given move
         TODO add battles
         """
-        from_cell_race = self.get_race(move.from_x, move.from_y)
         from_cell = self.pop_cell_at(move.from_x, move.from_y)
         to_cell = self.pop_cell_at(move.to_x, move.to_y)
-        if to_cell is None:
-            to_cell_population = 0
-        else:
-            to_cell_population = to_cell.population
 
-        if from_cell.population - move.amount < 0:
+        if to_cell.population > 0:
+            print "Warning: moving on someone else"
+
+        race = from_cell.race
+
+        if from_cell.population < move.amount:
             raise ValueError("Negative population")
-        from_cell.population -= move.amount
-
-        if from_cell_race == Race.VAMPIRES:
-            to_cell = Vampires(move.to_x, move.to_y, to_cell_population + move.amount)
-            self.vampires.append(to_cell)
-            if from_cell.population > 0:
-                self.vampires.append(from_cell)
-        elif from_cell_race == Race.WEREWOLVES:
-            to_cell = Werewolves(move.to_x, move.to_y, to_cell_population + move.amount)
-            self.werewolves.append(to_cell)
-            if from_cell.population > 0:
-                self.werewolves.append(from_cell)
+        elif from_cell.population == move.amount:
+            self.grid[move.to_x, move.to_y] = Cell(race, to_cell.population + move.amount)
         else:
-            raise ValueError("Trying to move something else than vampires or werewolves")
+            self.grid[move.to_x, move.to_y] = Cell(race, to_cell.population + move.amount)
+            self.grid[move.from_x, move.from_y] = Cell(race, from_cell.population - move.amount)
 
-    def get_state_after_move(self, move):
-        return 0
-
-    def get_werewolve_population(self):
+    def get_popultaion(self, race):
         """
         Returns total werewolves pop
         """
-        return sum([w.population for w in self.werewolves])
-
-    def get_vampire_population(self):
-        """
-        Returns total vampires pop
-        """
-        return sum([v.population for v in self.vampires])
+        return sum([cell.population for row in self.grid for cell in row if cell.race == race])
 
     def get_neighbor_cells_of(self, cell):
         """
@@ -232,7 +155,7 @@ class Map:
             for y in range(-1, 2):
                 if 0 < cell.x + x < self.size_x and 0 < cell.y + y < self.size_y \
                         and not (x == 0 and y == 0):
-                    legal_cells.append(Cell(cell.x + x, cell.y + y))
+                    legal_cells.append(self.grid[x][y])
 
         return legal_cells
 
@@ -249,18 +172,10 @@ class Map:
         """
         Representation of the map
         """
-        grid = [["  " for x in range(self.size_x)] for y in range(self.size_y)]
-        for house in self.houses:
-            grid[house.y][house.x] = str(house)
-        for vampire in self.vampires:
-            grid[vampire.y][vampire.x] = str(vampire)
-        for werewolve in self.werewolves:
-            grid[werewolve.y][werewolve.x] = str(werewolve)
-
         s = "  -" + "---" * self.size_x + "\n  "
-        for x in range(self.size_y):
-            for y in range(self.size_x):
-                s += "|{}".format(grid[x][y])
+        for y in range(self.size_y):
+            for x in range(self.size_x):
+                s += "|{}".format(self.grid[x][y])
             s += "|\n  "
         s += "-" + "---" * self.size_x
         return s

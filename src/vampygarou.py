@@ -1,6 +1,5 @@
 # coding: utf-8
 from strategy import Strategy
-from mapping import Race
 
 
 class Vampygarou:
@@ -17,12 +16,7 @@ class Vampygarou:
         self.strategy = None
 
     def retrieve_race(self):
-        if self.map.home.get_pos() == self.map.vampires[0].get_pos():
-            self.race = Race.VAMPIRES
-        else:
-            self.race = Race.WEREWOLVES
-
-        self.strategy = Strategy(race=self.race)
+        self.strategy = Strategy(race=self.map.get_player_race())
 
     def get_moves(self):
         """

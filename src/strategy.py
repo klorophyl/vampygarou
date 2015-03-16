@@ -61,8 +61,9 @@ class Strategy(object):
             neighbor_pop = state.get_pop(neighbor.x, neighbor.y)
 
             # /!\ only move everyone or 1 for now
-            for count in range(1, cell.population + 1):
-                if self.check_rules_on_unit_move(neighbor_race, neighbor_pop, count, cell.population):
+            for count in range(cell.population, cell.population + 1):
+                if self.check_rules_on_unit_move(neighbor_race, neighbor_pop,
+                                                 count, cell.population):
                     legal_unit_moves.append(Move(cell.x, cell.y, count, neighbor.x, neighbor.y))
 
         for length in xrange(1, cell.population + 1):
@@ -116,7 +117,8 @@ class Strategy(object):
         # TBM with bataille aleatoire
         if cell_race != self.race and cell_pop > move_pop:
             return False
-        if (move_pop < total_pop_on_cell / 4 or move_pop > total_pop_on_cell * 3 / 4) and move_pop != total_pop_on_cell:
+        if ((move_pop < total_pop_on_cell / 4 or move_pop > total_pop_on_cell * 3 / 4)
+                and move_pop != total_pop_on_cell):
             # do not leave behind too few people
             return False
         return True

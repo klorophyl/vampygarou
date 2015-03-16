@@ -58,7 +58,7 @@ def get_houses(vampygarou):
     n = server.get_messages_int(1)
     for i in range(n):
         x, y = server.get_messages_int(2)
-        vampygarou.map.add_house(x, y)
+        # vampygarou.map.add_house(x, y)
     print "- Got {} houses".format(n)
 
 
