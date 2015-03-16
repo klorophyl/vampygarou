@@ -34,23 +34,23 @@ class Strategy(object):
         coeff_enemy = 1000
         coeff_human = 100
 
-        enemy_cells = state.werewolves if self.race == Race.VAMPIRES else state.vampires
-        friend_cells = state.vampires if self.race == Race.VAMPIRES else state.werewolves
-        human_cells = state.houses
+        enemy_cells = state.get_cells(Race.WEREWOLVES if self.race == Race.VAMPIRES else Race.VAMPIRES)
+        friend_cells = state.get_cells(self.race)
+        human_cells = state.get_cells(Race.HUMANS)
 
         for enemy_cell in enemy_cells:
             for friend_cell in friend_cells:
-                dist = hypot(friend_cell.x - enemy_cell.x, friend_cell.y - enemy_cell.y)
-                enemy_pop = enemy_cell.population
-                friend_pop = friend_cell.population
+                dist = hypot(friend_cell[1] - enemy_cell[1], friend_cell[2] - enemy_cell[2])
+                enemy_pop = enemy_cell[0].population
+                friend_pop = friend_cell[0].population
                 diff_pop = friend_pop - enemy_pop
                 utility += coeff_enemy / dist * (diff_pop if friend_pop > 1.5 * enemy_pop else 0)
 
         for human_cell in human_cells:
             for friend_cell in friend_cells:
-                dist = hypot(friend_cell.x - human_cell.x, friend_cell.y - human_cell.y)
-                human_pop = human_cell.population
-                friend_pop = friend_cell.population
+                dist = hypot(friend_cell[1] - human_cell[1], friend_cell[2] - human_cell[2])
+                human_pop = human_cell[0].population
+                friend_pop = friend_cell[0].population
                 diff_pop = friend_pop - human_pop
                 utility += coeff_human / dist * (diff_pop if diff_pop > 0 else 0)
 
