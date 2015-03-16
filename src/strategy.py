@@ -8,7 +8,8 @@ from mapping import Move, Race
 
 
 class Strategy(object):
-    MAX_DEPTH = 2
+    MAX_DEPTH = 3
+    MAX_POP_MOVABLE = 4
 
     def __init__(self, race):
         self.race = race
@@ -23,7 +24,7 @@ class Strategy(object):
         """
         Choose a move randomly
         """
-        time.sleep(0.5)  # TO BE REMOVED
+        time.sleep(2)  # TO BE REMOVED
         return random.choice(self.get_actions(state))
 
     def get_utility(self, state):
@@ -58,15 +59,16 @@ class Strategy(object):
 
         for neighbor, neighbor_x, neighbor_y in state.get_neighbor_cells_of(x, y):
             # /!\ only move everyone or 1 for now
-            for count in range(cell.population, cell.population + 1):
+            for count in xrange(1, cell.population + 1):
                 if self.check_rules_on_unit_move(neighbor.race, neighbor.population,
                                                  count, cell.population):
                     legal_unit_moves.append(Move(x, y, count, neighbor_x, neighbor_y))
 
-        for length in xrange(1, cell.population + 1):
+        for length in xrange(1, cell.population / self.MAX_POP_MOVABLE + 1):
             # you can't make more moves than your total population
             # WARNING : this loop won't work when total pop is high (combination ftw)
-            for moves in itertools.combinations(legal_unit_moves, length):
+            combi = list(itertools.combinations(legal_unit_moves, length))
+            for moves in combi:
                 if self.is_turn_legal(moves, state):
                     legal_turns.append(list(moves))
 
@@ -113,7 +115,7 @@ class Strategy(object):
         if cell_race != self.race and cell_pop > move_pop:
             return False
 
-        if move_pop != total_pop_on_cell and (move_pop < 3 or (total_pop_on_cell - move_pop < 3)):
+        if move_pop != total_pop_on_cell and (move_pop < self.MAX_POP_MOVABLE or (total_pop_on_cell - move_pop < self.MAX_POP_MOVABLE)):
             # do not leave behind too few people
             return False
 
@@ -163,7 +165,7 @@ class Strategy(object):
         action_to_play = None
         for action in actions:
             action_value = self.min_value(
-                self.get_result(action, state), Strategy.MAX_DEPTH, alpha, beta
+                self.get_result(action, state), Strategy.MAX_DEPTH - 1, alpha, beta
             )
             if action_value > value:
                 value = action_value
@@ -178,12 +180,13 @@ class Strategy(object):
         """
         Returns max value according to minimax
         """
+        print "max_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
         if depth <= 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
-            for action_state in self.get_successors(state):
+            successors = self.get_successors(state)
+            for action_state in successors:
                 alpha = max(alpha, self.min_value(action_state, depth - 1, alpha, beta))
-                print "max_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
                 if alpha >= beta:
                     return beta
 
@@ -193,12 +196,13 @@ class Strategy(object):
         """
         Returns min value according to minimax
         """
+        print "min_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
         if depth <= 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
-            for action_state in self.get_successors(state):
+            successors = self.get_successors(state)
+            for action_state in successors:
                 beta = min(beta, self.max_value(action_state, depth - 1, alpha, beta))
-                print "min_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
                 if alpha >= beta:
                     return alpha
 
