@@ -17,11 +17,13 @@ class Strategy(object):
         """
         Returns the chosen move
         """
-        state = deepcopy(state)
-        return self.minimax(state, self.race)
+        return self.minimax(deepcopy(state))
 
     def get_random_move(self, state):
-        time.sleep(0.5)
+        """
+        Choose a move randomly
+        """
+        time.sleep(0.5)  # TO BE REMOVED
         return random.choice(self.get_actions(state))
 
     def get_utility(self, state):
@@ -30,9 +32,9 @@ class Strategy(object):
         """
         utility = 10 * (state.get_vampire_population() - state.get_werewolve_population())
         dist = 0
-        for v in state.vampires:
-            for w in state.werewolves:
-                dist += hypot(v.x - w.x, v.y - w.y)
+        for vampire in state.vampires:
+            for werewolve in state.werewolves:
+                dist += hypot(vampire.x - werewolve.x, vampire.y - werewolve.y)
 
         if self.race == Race.WEREWOLVES:
             utility *= -1
@@ -60,7 +62,7 @@ class Strategy(object):
 
             # /!\ only move everyone or 1 for now
             for count in range(1, cell.population + 1):
-                if self.check_rules_on_unit_move(neighbor_race, neighbor_pop, count):
+                if self.check_rules_on_unit_move(neighbor_race, neighbor_pop, count, cell.population):
                     legal_unit_moves.append(Move(cell.x, cell.y, count, neighbor.x, neighbor.y))
 
         for length in xrange(1, cell.population + 1):
@@ -103,12 +105,19 @@ class Strategy(object):
 
         return True
 
-    def check_rules_on_unit_move(self, cell_race, cell_pop, move_pop):
+    def check_rules_on_unit_move(self, cell_race, cell_pop, move_pop, total_pop_on_cell):
         """
         Check a set of rules to discriminate cells
+        cell_race :         target cell race
+        cell_pop :          target cell pop
+        move_pop :          pop you want to move
+        total_pop_on_cell:  total pop on current cell
         """
-        # TBM
+        # TBM with bataille aleatoire
         if cell_race != self.race and cell_pop > move_pop:
+            return False
+        if (move_pop < total_pop_on_cell / 4 or move_pop > total_pop_on_cell * 3 / 4) and move_pop != total_pop_on_cell:
+            # do not leave behind too few people
             return False
         return True
 
@@ -145,7 +154,7 @@ class Strategy(object):
 
         return new_state
 
-    def minimax(self, state, race):
+    def minimax(self, state):
         """
         Return best action according to minimax on a given state and race
         """
@@ -154,7 +163,7 @@ class Strategy(object):
         beta = float("inf")
         value = -float("inf")
         action_to_play = None
-        for action in random.sample(actions, 3):
+        for action in actions:
             action_value = self.min_value(
                 self.get_result(action, state), Strategy.MAX_DEPTH, alpha, beta
             )
@@ -175,7 +184,7 @@ class Strategy(object):
             return self.get_utility(state)
         else:
             successors = self.get_successors(state)
-            for action_state in random.sample(successors, 3):
+            for action_state in successors:
                 alpha = max(alpha, self.min_value(action_state, depth - 1, alpha, beta))
                 if alpha >= beta:
                     return beta
@@ -190,7 +199,7 @@ class Strategy(object):
             return self.get_utility(state)
         else:
             successors = self.get_successors(state)
-            for action_state in random.sample(successors, 3):
+            for action_state in successors:
                 beta = min(beta, self.max_value(action_state, depth - 1, alpha, beta))
                 if alpha >= beta:
                     return alpha
