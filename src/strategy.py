@@ -31,7 +31,8 @@ class Strategy(object):
         """
         Returns the heuristic
         """
-        utility = 10 * (state.get_vampire_population() - state.get_werewolve_population())
+        utility = 10 * (state.get_population(Race.VAMPIRES)
+                        - state.get_population(Race.WEREWOLVES))
         dist = 0
         for vampire in state.vampires:
             for werewolve in state.werewolves:
@@ -48,7 +49,9 @@ class Strategy(object):
         """
         Returns bool if the state is terminal
         """
-        return state.get_werewolve_population() == 0 or state.get_vampire_population() == 0
+        werewolves = state.get_population(Race.WEREWOLVES)
+        vampires = state.get_population(Race.VAMPIRES)
+        return werewolves == 0 or vampires == 0
 
     def get_actions_for_cell(self, cell, x, y, state):
         """
@@ -64,7 +67,7 @@ class Strategy(object):
                                                  count, cell.population):
                     legal_unit_moves.append(Move(x, y, count, neighbor_x, neighbor_y))
 
-        for length in xrange(1, cell.population / self.MAX_POP_MOVABLE + 1):
+        for length in xrange(1, cell.population / self.MAX_POP_MOVABLE + 2):
             # you can't make more moves than your total population
             # WARNING : this loop won't work when total pop is high (combination ftw)
             combi = list(itertools.combinations(legal_unit_moves, length))
@@ -115,7 +118,9 @@ class Strategy(object):
         if cell_race != self.race and cell_pop > move_pop:
             return False
 
-        if move_pop != total_pop_on_cell and (move_pop < self.MAX_POP_MOVABLE or (total_pop_on_cell - move_pop < self.MAX_POP_MOVABLE)):
+        if (move_pop != total_pop_on_cell
+                and (move_pop < self.MAX_POP_MOVABLE
+                     or (total_pop_on_cell - move_pop < self.MAX_POP_MOVABLE))):
             # do not leave behind too few people
             return False
 

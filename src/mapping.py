@@ -114,7 +114,7 @@ class Map:
 
     def pop_cell_at(self, x, y):
         cell = deepcopy(self.grid[x][y])
-        self.grid[x][y] = Cell(Race.EMPTY)
+        self.grid[x][y] = Cell(Race.NONE)
 
         return cell
 
@@ -134,12 +134,12 @@ class Map:
         if from_cell.population < move.amount:
             raise ValueError("Negative population")
         elif from_cell.population == move.amount:
-            self.grid[move.to_x, move.to_y] = Cell(race, to_cell.population + move.amount)
+            self.grid[move.to_x][move.to_y] = Cell(race, to_cell.population + move.amount)
         else:
-            self.grid[move.to_x, move.to_y] = Cell(race, to_cell.population + move.amount)
-            self.grid[move.from_x, move.from_y] = Cell(race, from_cell.population - move.amount)
+            self.grid[move.to_x][move.to_y] = Cell(race, to_cell.population + move.amount)
+            self.grid[move.from_x][move.from_y] = Cell(race, from_cell.population - move.amount)
 
-    def get_popultaion(self, race):
+    def get_population(self, race):
         """
         Returns total werewolves pop
         """
@@ -155,7 +155,7 @@ class Map:
             for y in range(-1, 2):
                 if 0 < cell_x + x < self.size_x and 0 < cell_y + y < self.size_y \
                         and not (x == 0 and y == 0):
-                    legal_cells.append((self.grid[x][y], x, y))
+                    legal_cells.append((self.grid[cell_x + x][cell_y + y], cell_x + x, cell_y + y))
 
         return legal_cells
 
