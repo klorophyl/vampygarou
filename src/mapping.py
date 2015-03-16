@@ -151,6 +151,16 @@ class Map:
         """
         return sum([cell.population for row in self.grid for cell in row if cell.race == race])
 
+    def get_cells(self, race):
+        cells = []
+        for y in range(self.size_y):
+            for x in range(self.size_x):
+                cell = self.grid[x][y]
+                if cell.race == race:
+                    cells.append((cell, x, y))
+
+        return cells
+
     def get_neighbor_cells_of(self, cell_x, cell_y):
         """
         Returns a list of possible cells
@@ -167,15 +177,7 @@ class Map:
 
     def get_player_cells_and_coordinates(self):
         race = self.get_player_race()
-        cells = []
-
-        for y in range(self.size_y):
-            for x in range(self.size_x):
-                cell = self.grid[x][y]
-                if cell.race == race:
-                    cells.append((cell, x, y))
-
-        return cells
+        return self.get_cells(race)
 
     def _check_bounds(self, x, y, cell_type):
         """
