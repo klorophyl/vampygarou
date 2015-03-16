@@ -62,8 +62,6 @@ class Map:
         self.home = None
         self.player_race = None
 
-        print self
-
     def empty_grid(self):
         return [[Cell(Race.NONE) for y in range(self.size_y)] for x in range(self.size_x)]
 
@@ -103,10 +101,6 @@ class Map:
         Update the number of humans, vampires, and werewolves on the map from changes sent by
         server.
         """
-        if len(changes) == 0:
-            return
-
-        self.grid = self.empty_grid()
         for cell in changes:
             x, y, humans, vampires, werewolves = cell
             if humans > 0:
@@ -115,6 +109,8 @@ class Map:
                 self.grid[x][y] = Cell(Race.VAMPIRES, vampires)
             if werewolves > 0:
                 self.grid[x][y] = Cell(Race.WEREWOLVES, werewolves)
+            if humans + vampires + werewolves == 0:
+                self.grid[x][y] = Cell(Race.NONE)
 
     def pop_cell_at(self, x, y):
         cell = deepcopy(self.grid[x][y])
@@ -142,8 +138,6 @@ class Map:
         else:
             self.grid[move.to_x][move.to_y] = Cell(race, to_cell.population + move.amount)
             self.grid[move.from_x][move.from_y] = Cell(race, from_cell.population - move.amount)
-
-        print self
 
     def get_population(self, race):
         """
