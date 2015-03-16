@@ -72,8 +72,6 @@ class Strategy(object):
                 if self.is_turn_legal(moves, state):
                     legal_turns.append(list(moves))
 
-        legal_turns.append([])  # add an empty move
-
         return legal_turns
 
     def is_turn_legal(self, moves, state):
@@ -163,7 +161,7 @@ class Strategy(object):
         beta = float("inf")
         value = -float("inf")
         action_to_play = None
-        for action in random.sample(actions, min(3, len(actions))):
+        for action in actions:
             action_value = self.min_value(
                 self.get_result(action, state), Strategy.MAX_DEPTH, alpha, beta
             )
@@ -183,9 +181,9 @@ class Strategy(object):
         if depth <= 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
-            successors = self.get_successors(state)
-            for action_state in random.sample(successors, min(3, len(successors))):
+            for action_state in self.get_successors(state):
                 alpha = max(alpha, self.min_value(action_state, depth - 1, alpha, beta))
+                print "max_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
                 if alpha >= beta:
                     return beta
 
@@ -198,9 +196,9 @@ class Strategy(object):
         if depth <= 0 or self.is_terminal(state):
             return self.get_utility(state)
         else:
-            successors = self.get_successors(state)
-            for action_state in random.sample(successors, min(3, len(successors))):
+            for action_state in self.get_successors(state):
                 beta = min(beta, self.max_value(action_state, depth - 1, alpha, beta))
+                print "min_value, depth: %s, alpha : %s, beta : %s" % (depth, alpha, beta)
                 if alpha >= beta:
                     return alpha
 
