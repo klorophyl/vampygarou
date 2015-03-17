@@ -1,4 +1,5 @@
 # coding: utf-8
+import random
 from message import Colors
 from copy import deepcopy
 
@@ -126,18 +127,65 @@ class Map:
         from_cell = self.pop_cell_at(move.from_x, move.from_y)
         to_cell = self.pop_cell_at(move.to_x, move.to_y)
 
-        if to_cell.population > 0:
-            print "Warning: moving on someone else"
-
         race = from_cell.race
 
-        if from_cell.population < move.amount:
-            raise ValueError("Negative population")
-        elif from_cell.population == move.amount:
-            self.grid[move.to_x][move.to_y] = Cell(race, to_cell.population + move.amount)
+        if to_cell.race != race and to_cell.race != Race.NONE:
+            self.attack(from_cell, to_cell, move)
         else:
-            self.grid[move.to_x][move.to_y] = Cell(race, to_cell.population + move.amount)
-            self.grid[move.from_x][move.from_y] = Cell(race, from_cell.population - move.amount)
+            # move to empty cell of friend
+            if from_cell.population < move.amount:
+                raise ValueError("Negative population")
+            elif from_cell.population == move.amount:
+                self.grid[move.to_x][move.to_y] = Cell(race, to_cell.population + move.amount)
+            else:
+                self.grid[move.to_x][move.to_y] = Cell(race, to_cell.population + move.amount)
+                self.grid[move.from_x][move.from_y] = Cell(race, from_cell.population - move.amount)
+
+    def attack(self, from_cell, to_cell, move):
+        if to_cell.race == Race.HUMANS:
+            proba = self.get_probability(to_cell.population, move.amount, 1.0)
+            if random.random() < proba:
+                # attacker wins
+                amount = proba * (move.amount + to_cell.population)
+                self.grid[move.to_x][move.to_y] = Cell(from_cell.race, int(amount))
+            else:
+                # attacker loses
+                amount = (1 - proba) * to_cell.population
+                self.grid[move.to_x][move.to_y] = Cell(Race.HUMANS, int(amount))
+
+        elif to_cell.race != from_cell.race:
+            # random battle
+            proba = self.get_probability(to_cell.population, move.amount, 1.5)
+            if random.random() < proba:
+                # attacker wins
+                amount = proba * move.amount
+                self.grid[move.to_x][move.to_y] = Cell(from_cell.race, int(amount))
+            else:
+                # attacker loses
+                amount = (1 - proba) * to_cell.population
+                self.grid[move.to_x][move.to_y] = Cell(to_cell.race, int(amount))
+
+        else:
+            raise ValueError("Wrong attack")
+
+    def get_probability(self, attacked, attacker, threshold):
+        """
+        Return probability that attacker wins
+        """
+        if attacker > threshold * attacked:
+            # win
+            proba = 1.0
+        elif attacker * threshold <  attacked:
+            # lose
+            proba = 0.0
+        elif attacker == attacked:
+            proba = 0.5
+        elif attacker < attacked:
+            proba = float(attacker) / (2 * attacked)
+        else:
+            proba = float(attacker) / attacked - 0.5
+
+        return proba
 
     def get_population(self, race):
         """

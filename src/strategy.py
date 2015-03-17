@@ -4,12 +4,13 @@ import random
 import time
 from math import hypot
 from copy import deepcopy
-from mapping import Move, Race
+from mapping import Move, Race, Map
 
 
 class Strategy(object):
     MAX_DEPTH = 3
     MAX_POP_MOVABLE = 4
+    SUB_MAP_COUNT = 2
 
     def __init__(self, race):
         self.race = race
@@ -105,7 +106,7 @@ class Strategy(object):
                                                  count, cell.population):
                     legal_unit_moves.append(Move(x, y, count, neighbor_x, neighbor_y))
 
-        for length in xrange(1, cell.population / self.MAX_POP_MOVABLE + 2):
+        for length in xrange(1, cell.population / self.MAX_POP_MOVABLE + 1):
             # you can't make more moves than your total population
             # WARNING : this loop won't work when total pop is high (combination ftw)
             combi = list(itertools.combinations(legal_unit_moves, length))
@@ -206,6 +207,11 @@ class Strategy(object):
         beta = float("inf")
         value = -float("inf")
         action_to_play = None
+
+        # 1 : determiner les zones d'interet
+        self.evaluate_sub_zones(state)
+        # 2 : trier actions
+
         for action in actions:
             action_value = self.min_value(
                 self.get_result(action, state), Strategy.MAX_DEPTH - 1, alpha, beta
@@ -218,6 +224,35 @@ class Strategy(object):
             raise ValueError("Something went wrong, action_value stayed at -inf")
 
         return action_to_play
+
+    def evaluate_sub_zones(self, state):
+        """
+        Split map into subzones and evaluate their worth
+        """
+        subzones = []
+        subzone_size_x = state.size_x / self.SUB_MAP_COUNT
+        subzone_size_y = state.size_y / self.SUB_MAP_COUNT
+
+        for i in xrange(0, self.SUB_MAP_COUNT):
+            for j in xrange(0, self.SUB_MAP_COUNT):
+                offset_x = 0 if i != self.SUB_MAP_COUNT - 1 else state.size_x - self.SUB_MAP_COUNT * subzone_size_x
+                offset_y = 0 if j != self.SUB_MAP_COUNT - 1 else state.size_y - self.SUB_MAP_COUNT * subzone_size_y
+                subzone = Map(subzone_size_x + offset_x, subzone_size_y + offset_y)
+                changes = []
+                for k in xrange(0, subzone.size_x):
+                    for l in xrange(0, subzone_size_y):
+                        world_coord = (k + i * subzone_size_x, l + j * subzone_size_y)
+                        cell = state.grid[world_coord[0]][world_coord[1]]
+                        human_pop = 0 if cell.race != Race.HUMANS else cell.population
+                        wolf_pop = 0 if cell.race != Race.WEREWOLVES else cell.population
+                        vampire_pop = 0 if cell.race != Race.VAMPIRES else cell.population
+                        changes.append((k, l, human_pop, vampire_pop, wolf_pop))
+                subzone.update_with_changes(changes)
+                subzones.append(subzone)
+
+        
+
+        # import ipdb; ipdb.set_trace()
 
     def max_value(self, state, depth, alpha, beta):
         """
