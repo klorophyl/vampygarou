@@ -1,10 +1,13 @@
 #  wow Gab, much English, very comment
 import itertools
 import random
-import time
 from math import hypot
 from copy import deepcopy
-from mapping import Move, Race, Map
+from mapping import Move, Race
+
+
+def sign(x):
+    return 1 if x > 0 else -1 if x < 0 else 0
 
 
 class Strategy(object):
@@ -26,6 +29,86 @@ class Strategy(object):
         Choose a move randomly
         """
         return random.choice(self.get_actions(state))
+
+    def get_bourrin_move(self, state):
+        """
+        Attack nearest human
+        When no humans are left, attack nearest enemy
+        """
+        enemy_cells = state.get_cells(Race.WEREWOLVES if self.race == Race.VAMPIRES else Race.VAMPIRES)
+        friend_cells = state.get_cells(self.race)
+        human_cells = state.get_cells(Race.HUMANS)
+
+        us, our_x, our_y = friend_cells[0]
+
+        target = self.choose_target(us, our_x, our_y, enemy_cells, human_cells, state)
+        print target
+        move = self.get_move_to_next_target(us, our_x, our_y, target)
+
+        return [move]
+
+    def choose_target(self, us, our_x, our_y, enemy_cells, human_cells, state):
+        # prio 1: avoid strong enemy
+        print 1
+        for cell, x, y in enemy_cells:
+            if max([abs(our_x - x), abs(our_y - y)]) < 3 and cell.population >= us.population:
+                target_x, target_y = our_x + sign(our_x - x), our_y + sign(our_y - y)
+                if self.is_target_legal(target_x, target_y, state):
+                    return target_x, target_y
+
+        # avoid strong humans
+        print 2
+        for cell, x, y in human_cells:
+            if max([abs(our_x - x), abs(our_y - y)]) < 2 and cell.population > us.population:
+                target_x, target_y = our_x + sign(our_x - x), our_y + sign(our_y - y)
+                if self.is_target_legal(target_x, target_y, state):
+                    return target_x, target_y
+
+        # prio 2: attack weak enemy
+        print 3
+        min_dist = float("inf")
+        target_x, target_y = None, None
+        for cell, x, y in enemy_cells:
+            dist = max([abs(our_x - x), abs(our_y - y)])
+            if dist < min_dist and cell.population * 1.5 <= us.population:
+                min_dist = dist
+                target_x, target_y = x, y
+
+        if target_x is not None:
+            return target_x, target_y
+
+        # prio 3: attack weak human
+        print 4
+        for cell, x, y in human_cells:
+            dist = max([abs(our_x - x), abs(our_y - y)])
+            if dist < min_dist and cell.population <= us.population:
+                min_dist = dist
+                target_x, target_y = x, y
+
+        if target_x is not None:
+            return target_x, target_y
+
+        # prio 4: attack anything
+        print 5
+        for cell, x, y in enemy_cells + human_cells:
+            dist = max([abs(our_x - x), abs(our_y - y)])
+            if dist < min_dist:
+                min_dist = dist
+                target_x, target_y = x, y
+
+        return target_x, target_y
+
+    def get_move_to_next_target(self, us, our_x, our_y, target):
+        target_x, target_y = target
+
+        move = Move(our_x, our_y, us.population,
+                    our_x + sign(target_x - our_x), our_y + sign(target_y - our_y))
+
+        # if not self.is_turn_legal([])
+        return move
+
+    def is_target_legal(self, target_x, target_y, state):
+        return 0 < target_x < state.size_x and 0 < target_y < state.size_y
 
     def get_utility(self, state):
         """
@@ -183,10 +266,6 @@ class Strategy(object):
         value = -float("inf")
         action_to_play = None
 
-        # 1 : determiner les zones d'interet
-        self.evaluate_sub_zones(state)
-        # 2 : trier actions
-
         for action in actions:
             action_value = self.min_value(
                 self.get_result(action, state), Strategy.MAX_DEPTH - 1, alpha, beta
@@ -199,35 +278,6 @@ class Strategy(object):
             raise ValueError("Something went wrong, action_value stayed at -inf")
 
         return action_to_play
-
-    def evaluate_sub_zones(self, state):
-        """
-        Split map into subzones and evaluate their worth
-        """
-        subzones = []
-        subzone_size_x = state.size_x / self.SUB_MAP_COUNT
-        subzone_size_y = state.size_y / self.SUB_MAP_COUNT
-
-        for i in xrange(0, self.SUB_MAP_COUNT):
-            for j in xrange(0, self.SUB_MAP_COUNT):
-                offset_x = 0 if i != self.SUB_MAP_COUNT - 1 else state.size_x - self.SUB_MAP_COUNT * subzone_size_x
-                offset_y = 0 if j != self.SUB_MAP_COUNT - 1 else state.size_y - self.SUB_MAP_COUNT * subzone_size_y
-                subzone = Map(subzone_size_x + offset_x, subzone_size_y + offset_y)
-                changes = []
-                for k in xrange(0, subzone.size_x):
-                    for l in xrange(0, subzone_size_y):
-                        world_coord = (k + i * subzone_size_x, l + j * subzone_size_y)
-                        cell = state.grid[world_coord[0]][world_coord[1]]
-                        human_pop = 0 if cell.race != Race.HUMANS else cell.population
-                        wolf_pop = 0 if cell.race != Race.WEREWOLVES else cell.population
-                        vampire_pop = 0 if cell.race != Race.VAMPIRES else cell.population
-                        changes.append((k, l, human_pop, vampire_pop, wolf_pop))
-                subzone.update_with_changes(changes)
-                subzones.append(subzone)
-
-        
-
-        # import ipdb; ipdb.set_trace()
 
     def max_value(self, state, depth, alpha, beta):
         """
