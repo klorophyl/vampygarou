@@ -122,7 +122,32 @@ class Strategy(object):
         friend_cells = state.get_cells(self.race)
         human_cells = state.get_cells(Race.HUMANS)
 
-        for enemy_cell in enemy_cells:
+        werewolves = state.get_population(Race.WEREWOLVES)
+        vampires = state.get_population(Race.VAMPIRES)
+        if state.get_population(self.race) == 0:
+            return -float("inf")
+
+        if state.get_population(self.race) == vampires + werewolves:
+            return float("inf")
+
+        for friend_cell in friend_cells:
+            dist_min = float("inf")
+            for human_cell in human_cells:
+                if hypot(friend_cell[1] - human_cell[1], friend_cell[2] - human_cell[2]) < dist_min:
+                    dist_min = hypot(friend_cell[1] - human_cell[1], friend_cell[2] - human_cell[2])
+                    closest_human = human_cell
+            surplus_pop = closest_human[0].population if closest_human[0].population < friend_cell[0].population else 0
+            danger = 0
+            for enemy_cell in enemy_cells:
+                if hypot(enemy_cell[1] - closest_human[1], enemy_cell[2] - closest_human[2]) < dist_min:
+                    if friend_cell[0].population > 1.5 * (enemy_cell[0].population + surplus_pop ):
+                        danger += 0
+                    else:
+                        danger += (enemy_cell[0].population - friend_cell[0].population)*5
+
+            utility += 3*surplus_pop - 2*danger + 3*dist_min
+
+        """for enemy_cell in enemy_cells: 
             for friend_cell in friend_cells:
                 dist = hypot(friend_cell[1] - enemy_cell[1], friend_cell[2] - enemy_cell[2])
                 enemy_pop = enemy_cell[0].population
@@ -138,7 +163,7 @@ class Strategy(object):
                 diff_pop = friend_pop - human_pop
                 utility += coeff_human / dist * (diff_pop if diff_pop > 0 else 0)
 
-        utility += 1000000 * state.get_population(self.race)
+        utility += 1000000 * state.get_population(self.race)"""
 
         return utility
 
